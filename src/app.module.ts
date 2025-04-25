@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { typeOrmModuleAsyncOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     AuthModule,
     TypeOrmModule.forRootAsync(typeOrmModuleAsyncOptions),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
