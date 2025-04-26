@@ -178,7 +178,8 @@ export class SubmissionService {
 
     await blockBlobClient.uploadStream(fileStream);
 
-    // 파일 url 을 리턴해준다.
+    // 음성 & 동영상파일 url 을 리턴해준다.
+    // AI가 음성 영상 데이터로 평가하는 기능도 추가할 예정
     return blockBlobClient.url;
   }
 }
