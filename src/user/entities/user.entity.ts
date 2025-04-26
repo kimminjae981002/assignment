@@ -18,9 +18,12 @@ export class User extends BaseEntity {
   name: string;
 
   @Column()
-  age: number;
+  role: string;
 
   @Column()
+  age: number;
+
+  @Column({ nullable: true, default: 0 })
   level: number;
 
   @Column()
@@ -29,6 +32,6 @@ export class User extends BaseEntity {
   @Column()
   birthDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   paymentDate: Date;
 }
