@@ -95,7 +95,7 @@ export class SubmissionService {
       ffmpeg(filePath)
         .noVideo()
         .audioCodec('libmp3lame')
-        .output(outputAudioPath)
+        .output(outputAudioPath) // 이 경로에 저장한다.
         .on('end', resolve)
         .on('error', reject)
         .run();
@@ -104,9 +104,9 @@ export class SubmissionService {
     // 영상 오른쪽 이미지 제거 & 음성 제거
     await new Promise((resolve, reject) => {
       ffmpeg(filePath)
-        .noAudio()
-        .videoFilter('crop=iw/2:ih:0:0')
-        .output(outputVideoNoAudioPath)
+        .noAudio() // 오디오 제거
+        .videoFilter('crop=iw/2:ih:0:0') // 오른쪽 이미지 제거
+        .output(outputVideoNoAudioPath) // 이 경로에 저장한다.
         .on('end', resolve)
         .on('error', reject)
         .run();
