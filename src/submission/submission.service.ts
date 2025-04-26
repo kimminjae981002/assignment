@@ -79,7 +79,13 @@ export class SubmissionService {
 
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
-    await this.processVideo(file, user.userId);
+    if (file) {
+      const sasUrl = await this.processVideo(file, user.userId);
+
+      return {
+        mediaUrl: sasUrl,
+      };
+    }
 
     //     const submission = this.submissionRepository.create(createSubmissionDto);
     //     return await this.submissionRepository.save(submission);
@@ -120,10 +126,23 @@ export class SubmissionService {
     });
 
     // 예시: audio.mp3 업로드
-    await this.uploadToAzureBlob(outputAudioPath, userId, 'audio');
+    const audio = await this.uploadToAzureBlob(
+      outputAudioPath,
+      userId,
+      'audio',
+    );
 
     // 예시: video_no_audio.mp4 업로드
-    await this.uploadToAzureBlob(outputVideoNoAudioPath, userId, 'video');
+    const video = await this.uploadToAzureBlob(
+      outputVideoNoAudioPath,
+      userId,
+      'video',
+    );
+
+    return {
+      video,
+      audio,
+    };
   }
 
   // Azure 클라우스 서비스에 저장하기
@@ -196,6 +215,8 @@ export class SubmissionService {
 
     // 음성 & 동영상파일 SAS url 을 리턴해준다.
     // AI가 음성 영상 데이터로 평가하는 기능도 추가할 예정
-    return sasToken;
+    const sasUrl = `${blockBlobClient.url}?${sasToken}`;
+
+    return sasUrl;
   }
 }
