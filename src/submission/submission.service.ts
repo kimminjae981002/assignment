@@ -50,6 +50,16 @@ export class SubmissionService {
         '작성한 사용자 아이디와 유저 아이디가 다릅니다.',
       );
 
+    const existComponentType = await this.submissionRepository.findOne({
+      where: { id: findUser.id, componentType },
+    });
+
+    if (existComponentType) {
+      throw new BadRequestException(
+        '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
+      );
+    }
+
     //     const submission = this.submissionRepository.create(createSubmissionDto);
     //     return await this.submissionRepository.save(submission);
   }
