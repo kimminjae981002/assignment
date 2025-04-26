@@ -1,4 +1,9 @@
-import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import {
   Body,
@@ -21,7 +26,23 @@ export class SubmissionController {
   constructor(private readonly submissionsService: SubmissionService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('videoFile'))
+  @ApiOperation({ summary: '과제 제출' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        studentName: { type: 'string' },
+        studentId: { type: 'string' },
+        componentType: { type: 'string' },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
   async sendSubmission(
     @Body() createSubmissionDto: CreateSubmissionDto,
     @CurrentUser() user: JwtPayloadInterface,
