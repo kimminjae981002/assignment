@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, UserRole } from 'src/common/entities/enums/user.enum';
+import { Gender, UserRole } from 'src/common/enums/user.enum';
 
 // 회원가입
 export class CreateUserDto {

@@ -8,15 +8,48 @@ import {
   IsOptional,
   IsUrl,
   IsEnum,
+  IsNumber,
 } from 'class-validator';
-import { Status } from 'src/common/entities/enums/submission.enum';
+import { Status } from 'src/common/enums/submission.enum';
 
 export class CreateSubmissionDto {
+  @ApiProperty({
+    description: '유저 아이디',
+    example: 'example123',
+  })
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
+
+  @ApiProperty({
+    description: '유저 이름',
+    example: 'example',
+  })
+  @IsString()
+  @IsNotEmpty()
+  studentName: string;
+
+  @ApiProperty({
+    description: 'Essay writing',
+    example: 'essay writing',
+  })
+  @IsString()
+  @IsNotEmpty()
+  componentType: string;
+
+  @ApiProperty({
+    description: '제출 상세 내용',
+    example: 'what is the title?',
+  })
+  @IsString()
+  @IsNotEmpty()
+  submitText: string;
+
   @ApiProperty({
     description: '비디오 파일 원본 URL',
     example: 'file.mp4',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   fileUrl: string;
 

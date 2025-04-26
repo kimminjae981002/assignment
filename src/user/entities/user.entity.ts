@@ -7,7 +7,7 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, name: 'user_id' })
   userId: string;
 
   @Column()
@@ -28,10 +28,10 @@ export class User extends BaseEntity {
   @Column()
   gender: string;
 
-  @Column()
+  @Column({ name: 'birth_date' })
   birthDate: Date;
 
-  @Column({ nullable: true })
+  @Column({ name: 'payment_date', nullable: true })
   paymentDate: Date;
 
   // OneToMany 관계를 통해 Submission 엔티티와 연결
