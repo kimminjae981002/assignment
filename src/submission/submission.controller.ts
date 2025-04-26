@@ -32,9 +32,10 @@ export class SubmissionController {
     schema: {
       type: 'object',
       properties: {
-        studentName: { type: 'string' },
-        studentId: { type: 'string' },
-        componentType: { type: 'string' },
+        studentName: { type: 'string', example: 'example' },
+        studentId: { type: 'string', example: 'example123' },
+        submitText: { type: 'string', example: '열심히 했습니다!' },
+        componentType: { type: 'string', example: 'Speaking' },
         file: {
           type: 'string',
           format: 'binary',
@@ -51,6 +52,7 @@ export class SubmissionController {
     return await this.submissionsService.sendSubmission(
       createSubmissionDto,
       user,
+      file,
     );
   }
 }

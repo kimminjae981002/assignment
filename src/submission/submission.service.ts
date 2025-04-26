@@ -1,3 +1,7 @@
+import * as ffmpeg from 'fluent-ffmpeg';
+// import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 import {
   BadRequestException,
   Injectable,
@@ -9,15 +13,14 @@ import { Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
-import ffmpeg from 'fluent-ffmpeg';
 import {
   generateBlobSASQueryParameters,
   BlobSASPermissions,
   SASProtocol,
   StorageSharedKeyCredential,
 } from '@azure/storage-blob';
-
+import * as path from 'path';
+import * as fs from 'fs';
 @Injectable()
 export class SubmissionService {
   constructor(
@@ -35,6 +38,7 @@ export class SubmissionService {
   async sendSubmission(
     createSubmissionDto: CreateSubmissionDto,
     user: JwtPayloadInterface,
+    file: Express.Multer.File, // 여기 추가!!
   ) {
     const { studentName, studentId, componentType } = createSubmissionDto;
 
@@ -68,7 +72,44 @@ export class SubmissionService {
       );
     }
 
+    // 영상 & 음성 추출
+    await this.processVideo(file);
+
     //     const submission = this.submissionRepository.create(createSubmissionDto);
     //     return await this.submissionRepository.save(submission);
+  }
+
+  // 동영상 파일 이미지 제거 & 영상 음성 제거 /  음성 추출
+  async processVideo(file) {
+    const uploadDir = path.resolve(process.cwd(), 'src', 'uploads');
+
+    // 업로드된 파일 경로 (절대 경로로 변환)
+    const filePath = path.resolve(file.path); // 업로드된 파일의 절대 경로
+
+    // 저장할 파일 경로와 네임
+    const outputAudioPath = path.join(uploadDir, 'audio.mp3');
+    const outputVideoNoAudioPath = path.join(uploadDir, 'video_no_audio.mp4');
+
+    // 음성 추출
+    await new Promise((resolve, reject) => {
+      ffmpeg(filePath)
+        .noVideo()
+        .audioCodec('libmp3lame')
+        .output(outputAudioPath)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
+    });
+
+    // 영상 오른쪽 이미지 제거 & 음성 제거
+    await new Promise((resolve, reject) => {
+      ffmpeg(filePath)
+        .noAudio()
+        .videoFilter('crop=iw/2:ih:0:0')
+        .output(outputVideoNoAudioPath)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
+    });
   }
 }

@@ -93,7 +93,7 @@ export class AuthService {
 
     // accessToken 유효 기간15분
     const accessToken = this.jwtService.sign(accessTokenPayload, {
-      expiresIn: '15m',
+      expiresIn: '1d',
     });
 
     // refreshToken 유효 기간 7일

@@ -3,9 +3,16 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as path from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // 정적 파일 제공 설정 (uploads 폴더)
+  app.useStaticAssets(path.join(__dirname, 'uploads'), {
+    prefix: '/uploads/', // URL 경로에 /uploads 를 붙여서 접근할 수 있도록 설정
+  });
 
   // PORT 환경변수
   const configService = app.get(ConfigService);
