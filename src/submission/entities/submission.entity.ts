@@ -7,8 +7,8 @@ export class Submission extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id' })
-  userId: number;
+  @Column({ name: 'student_id' })
+  studentId: string;
 
   @Column({ name: 'file_url' })
   fileUrl: string;
