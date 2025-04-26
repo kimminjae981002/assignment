@@ -1,5 +1,6 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
+import { Submission } from 'src/submission/entities/submission.entity';
 import { User } from 'src/user/entities/user.entity';
 
 export const typeOrmModuleAsyncOptions: TypeOrmModuleAsyncOptions = {
@@ -14,7 +15,7 @@ export const typeOrmModuleAsyncOptions: TypeOrmModuleAsyncOptions = {
     database: configService.get<string>('DB_NAME'),
     synchronize: configService.get<boolean>('DB_SYNC'),
     autoLoadEntities: true,
-    entities: [User],
+    entities: [User, Submission],
     logging: false,
   }),
 };
