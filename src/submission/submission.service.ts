@@ -45,7 +45,8 @@ export class SubmissionService {
     user: JwtPayloadInterface,
     file: Express.Multer.File,
   ) {
-    const { studentName, studentId, componentType } = createSubmissionDto;
+    const { studentName, studentId, componentType, submitText } =
+      createSubmissionDto;
 
     // 가드: 유저 고유아이디를 이용해 유저를 찾는다.
     const findUser: User | null = await this.userRepository.findOne({
@@ -75,6 +76,10 @@ export class SubmissionService {
       throw new BadRequestException(
         '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
       );
+    }
+
+    if (!submitText) {
+      throw new BadRequestException('평가 받을 과제를 제출해주세요.');
     }
 
     // 영상 & 음성 추출
