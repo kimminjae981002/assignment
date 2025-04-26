@@ -1,7 +1,6 @@
 import { LoginUserDto } from './../user/dto/login-user.dto';
 import { ConfigService } from '@nestjs/config';
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -80,12 +79,17 @@ export class AuthService {
 
     // access token payload
     const accessTokenPayload = {
-      id: user.id,
+      userId: user.userId,
+      sub: user.id,
       tokenType: 'access',
     };
 
     // refresh token payload
-    const refreshTokenPayload = { id: user.id, tokenType: 'refresh' };
+    const refreshTokenPayload = {
+      userId: user.userId,
+      sub: user.id,
+      tokenType: 'refresh',
+    };
 
     // accessToken 유효 기간15분
     const accessToken = this.jwtService.sign(accessTokenPayload, {

@@ -27,7 +27,10 @@ async function bootstrap() {
     .setTitle('AI 기반 영어 과제 평가')
     .setDescription('학생의 영어 과제를 평가하는 API 문서')
     .setVersion('1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
