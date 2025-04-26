@@ -73,7 +73,7 @@ export class SubmissionService {
         '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
       );
     }
-    console.log(user.userId, 'test');
+
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
     await this.processVideo(file, user.userId);
