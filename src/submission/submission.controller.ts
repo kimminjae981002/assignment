@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { Request } from 'express';
 import { SubmissionService } from './submission.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { JwtPayloadDto } from 'src/auth/interface/jwt-payload.dto';
+import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 
 @Controller('submissions')
 @UseGuards(JwtAuthGuard)
@@ -16,7 +16,7 @@ export class SubmissionController {
   @Post()
   async sendSubmission(
     @Body() createSubmissionDto: CreateSubmissionDto,
-    @CurrentUser() user: JwtPayloadDto,
+    @CurrentUser() user: JwtPayloadInterface,
   ) {
     return await this.submissionsService.sendSubmission(
       createSubmissionDto,

@@ -8,7 +8,7 @@ import { Submission } from './entities/submission.entity';
 import { Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { User } from 'src/user/entities/user.entity';
-import { JwtPayloadDto } from 'src/auth/interface/jwt-payload.dto';
+import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 
 @Injectable()
 export class SubmissionService {
@@ -26,7 +26,7 @@ export class SubmissionService {
   //        변환된 파일은 submission_media에 저장이된다.
   async sendSubmission(
     createSubmissionDto: CreateSubmissionDto,
-    user: JwtPayloadDto,
+    user: JwtPayloadInterface,
   ) {
     const { studentName, studentId, componentType } = createSubmissionDto;
 
