@@ -11,8 +11,12 @@ import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
-
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+import {
+  generateBlobSASQueryParameters,
+  BlobSASPermissions,
+  SASProtocol,
+  StorageSharedKeyCredential,
+} from '@azure/storage-blob';
 
 @Injectable()
 export class SubmissionService {
