@@ -43,7 +43,7 @@ export class SubmissionService {
   async sendSubmission(
     createSubmissionDto: CreateSubmissionDto,
     user: JwtPayloadInterface,
-    file: Express.Multer.File, // 여기 추가!!
+    file: Express.Multer.File,
   ) {
     const { studentName, studentId, componentType } = createSubmissionDto;
 
