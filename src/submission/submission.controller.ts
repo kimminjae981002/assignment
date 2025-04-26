@@ -4,6 +4,8 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { Request } from 'express';
 import { SubmissionService } from './submission.service';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { JwtPayloadDto } from 'src/auth/interface/jwt-payload.dto';
 
 @Controller('submissions')
 @UseGuards(JwtAuthGuard)
@@ -14,11 +16,11 @@ export class SubmissionController {
   @Post()
   async sendSubmission(
     @Body() createSubmissionDto: CreateSubmissionDto,
-    @Req() req: any,
+    @CurrentUser() user: JwtPayloadDto,
   ) {
     return await this.submissionsService.sendSubmission(
       createSubmissionDto,
-      req.user,
+      user,
     );
   }
 }
