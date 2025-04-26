@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Submission } from 'src/submission/entities/submission.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -32,4 +33,8 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   paymentDate: Date;
+
+  // OneToMany 관계를 통해 Submission 엔티티와 연결
+  @OneToMany(() => Submission, (submission) => submission.user)
+  submissions: Submission[]; // 이 부분은 User가 여러 개의 Submission을 가질 수 있음을 의미
 }

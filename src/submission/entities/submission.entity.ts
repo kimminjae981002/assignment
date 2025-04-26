@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('submissions')
 export class Submission extends BaseEntity {
@@ -10,7 +11,7 @@ export class Submission extends BaseEntity {
   userId: number;
 
   @Column()
-  file_url: string;
+  fileUrl: string;
 
   @Column()
   status: string;
@@ -26,4 +27,8 @@ export class Submission extends BaseEntity {
 
   @Column({ type: 'jsonb' })
   metadata: object;
+
+  // ManyToOne 관계를 통해 User 엔티티와 매핑
+  @ManyToOne(() => User, (user) => user.submissions)
+  user: User; // 이 필드는 외래 키인 userId와 자동으로 연결됩니다.
 }
