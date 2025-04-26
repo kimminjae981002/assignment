@@ -1,3 +1,4 @@
+import { Matches, MaxLength, MinLength } from 'class-validator';
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
@@ -19,9 +20,6 @@ export class User extends BaseEntity {
 
   @Column()
   role: string;
-
-  @Column()
-  age: number;
 
   @Column({ nullable: true, default: 0 })
   level: number;
