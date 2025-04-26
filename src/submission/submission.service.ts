@@ -1,9 +1,6 @@
+import { AzureService } from './../azure/azure.service';
 import { VideoService } from './../video/video.service';
 import { ConfigService } from '@nestjs/config';
-import * as ffmpeg from 'fluent-ffmpeg';
-// import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 import {
   BadRequestException,
   Injectable,
@@ -15,16 +12,6 @@ import { Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
-import {
-  StorageSharedKeyCredential,
-  BlobServiceClient,
-  generateBlobSASQueryParameters,
-  BlobSASPermissions,
-  SASProtocol,
-} from '@azure/storage-blob';
-import * as path from 'path';
-import * as fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class SubmissionService {
@@ -35,6 +22,7 @@ export class SubmissionService {
     private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
     private readonly videoService: VideoService,
+    private readonly azureService: AzureService,
   ) {}
 
   // 과제 제출
@@ -87,89 +75,25 @@ export class SubmissionService {
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
     if (file) {
-      const sasUrl = await this.videoService.processVideo(file, user.userId);
+      const audio = await this.videoService.audio(file, user.userId);
+      const video = await this.videoService.videoInNoAudio(file, user.userId);
 
+      const audioSasUrl = await this.azureService.uploadToAzureBlob(
+        audio,
+        user.userId,
+        'audio',
+      );
+      const videoSasUrl = await this.azureService.uploadToAzureBlob(
+        video,
+        user.userId,
+        'video',
+      );
       return {
-        mediaUrl: sasUrl,
+        mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
       };
     }
 
     //     const submission = this.submissionRepository.create(createSubmissionDto);
     //     return await this.submissionRepository.save(submission);
-  }
-
-  // Azure 클라우스 서비스에 저장하기
-  async uploadToAzureBlob(
-    filePath: string,
-    userId: string,
-    fileType: 'audio' | 'video',
-  ): Promise<string> {
-    // Azure 설정 환경변수 가져오기
-    const azureAccount: string = this.configService.get<string>(
-      'AZURE_STORAGE_ACCOUNT',
-    ) as string;
-
-    const azureAccountKey: string = this.configService.get<string>(
-      'AZURE_STORAGE_KEY',
-    ) as string;
-
-    const azureContainerName: string = this.configService.get<string>(
-      'AZURE_STORAGE_CONTAINER',
-    ) as string;
-
-    if (!azureAccount || !azureAccountKey || !azureContainerName) {
-      throw new BadRequestException('AZURE 설정 실패');
-    }
-
-    // azure storage name과 key를 이용해 azure에 인증한다.
-    const realAzureAccount = new StorageSharedKeyCredential(
-      azureAccount,
-      azureAccountKey,
-    );
-
-    // azure 계정을 이용해 azure blob storage에 접속한다.
-    const blobServiceClient = new BlobServiceClient(
-      `https://${azureAccount}.blob.core.windows.net`,
-      realAzureAccount,
-    );
-
-    const folderName: string = userId; // 유저 아이디를 이용해 저장
-    const fileName: string = uuidv4(); // uuid를 이용해 파일 저장
-
-    // 파일 경로 설정: audio 또는 video 폴더에 저장
-    const blobName = path.join(
-      folderName,
-      fileType,
-      `${fileName}.${fileType === 'audio' ? 'mp3' : 'mp4'}`,
-    );
-
-    // 컨테이너를 선택한다.
-    const containerClient =
-      blobServiceClient.getContainerClient(azureContainerName);
-
-    // 파일을 저장한다.
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    const fileStream = fs.createReadStream(filePath);
-
-    await blockBlobClient.uploadStream(fileStream);
-
-    // SAS URL 추출
-    const sasToken = generateBlobSASQueryParameters(
-      {
-        containerName: azureContainerName,
-        blobName,
-        permissions: BlobSASPermissions.parse('r'), // read 권한
-        startsOn: new Date(),
-        expiresOn: new Date(new Date().valueOf() + 3600 * 1000), // 1시간 유효
-        protocol: SASProtocol.Https,
-      },
-      realAzureAccount,
-    ).toString();
-
-    // 음성 & 동영상파일 SAS url 을 리턴해준다.
-    // AI가 음성 영상 데이터로 평가하는 기능도 추가할 예정
-    const sasUrl = `${blockBlobClient.url}?${sasToken}`;
-
-    return sasUrl;
   }
 }
