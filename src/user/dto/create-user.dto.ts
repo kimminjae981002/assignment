@@ -1,52 +1,39 @@
-import {
-  IsString,
-  IsEmail,
-  IsNotEmpty,
-  IsInt,
-  IsEnum,
-  IsDateString,
-  IsOptional,
-} from 'class-validator';
-import { Gender, UserRole } from 'src/common/entities/enums/user.enum';
+import { ApiProperty } from '@nestjs/swagger'; // Swagger 데코레이터
 
+// 회원가입 DTO
 export class CreateUserDto {
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ description: 'User ID', example: 'example123' })
   userId: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ description: 'User Password', example: 'Example123!' })
   password: string;
 
-  @IsNotEmpty()
-  @IsEmail()
+  @ApiProperty({ description: 'Email', example: 'example@example.com' })
   email: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ description: '이름', example: 'example' })
   name: string;
 
-  @IsNotEmpty()
-  @IsInt()
+  @ApiProperty({ description: '나이', example: 20 })
   age: number;
 
-  @IsNotEmpty()
-  @IsEnum(UserRole)
-  role: UserRole;
+  @ApiProperty({
+    description: '사용자 역할',
+    enum: ['student', 'admin'],
+    example: 'student',
+  })
+  role: string;
 
-  @IsOptional()
-  @IsInt()
+  @ApiProperty({ description: '학생 레벨', example: 1, required: false })
   level: number;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsEnum(Gender)
-  gender: Gender;
+  @ApiProperty({
+    description: '성별',
+    enum: ['male', 'female', 'secret'],
+    example: 'male',
+  })
+  gender: string;
 
-  @IsNotEmpty()
-  @IsDateString()
+  @ApiProperty({ description: '생년월일', example: '2000-01-01' })
   birthDate: Date;
-
-  @IsDateString()
-  paymentDate: Date;
 }
