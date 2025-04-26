@@ -17,6 +17,9 @@ import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import {
   StorageSharedKeyCredential,
   BlobServiceClient,
+  generateBlobSASQueryParameters,
+  BlobSASPermissions,
+  SASProtocol,
 } from '@azure/storage-blob';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -178,8 +181,21 @@ export class SubmissionService {
 
     await blockBlobClient.uploadStream(fileStream);
 
-    // 음성 & 동영상파일 url 을 리턴해준다.
+    // SAS URL 추출
+    const sasToken = generateBlobSASQueryParameters(
+      {
+        containerName: azureContainerName,
+        blobName,
+        permissions: BlobSASPermissions.parse('r'), // read 권한
+        startsOn: new Date(),
+        expiresOn: new Date(new Date().valueOf() + 3600 * 1000), // 1시간 유효
+        protocol: SASProtocol.Https,
+      },
+      realAzureAccount,
+    ).toString();
+
+    // 음성 & 동영상파일 SAS url 을 리턴해준다.
     // AI가 음성 영상 데이터로 평가하는 기능도 추가할 예정
-    return blockBlobClient.url;
+    return sasToken;
   }
 }
