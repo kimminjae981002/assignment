@@ -42,12 +42,4 @@ export class CreateSubmissionDto {
   @IsString()
   @IsNotEmpty()
   submitText: string;
-
-  @ApiProperty({
-    description: '비디오 파일 원본 URL',
-    example: 'file.mp4',
-  })
-  @IsOptional()
-  @IsString()
-  fileUrl: string;
 }

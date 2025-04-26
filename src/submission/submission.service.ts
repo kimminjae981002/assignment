@@ -9,6 +9,10 @@ import { Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import ffmpeg from 'fluent-ffmpeg';
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 @Injectable()
 export class SubmissionService {
