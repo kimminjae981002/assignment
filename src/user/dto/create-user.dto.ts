@@ -41,15 +41,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    description: '사용자 역할',
-    enum: UserRole,
-    example: 'student',
-  })
-  @IsEnum(UserRole, { message: '잘못된 사용자 역할입니다.' })
-  @IsNotEmpty()
-  role: UserRole;
-
   @ApiProperty({ description: '학생 레벨', example: 1, required: false })
   @IsOptional()
   level: number;
@@ -57,7 +48,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: '성별',
     enum: Gender,
-    example: 'male',
+    example: 'male | female | secret',
   })
   @IsNotEmpty()
   @IsEnum(Gender, { message: '잘못된 성별 값입니다.' })

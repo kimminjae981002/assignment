@@ -6,11 +6,9 @@ import {
   Min,
   IsString,
   IsOptional,
-  IsUrl,
   IsEnum,
-  IsNumber,
 } from 'class-validator';
-import { Status } from 'src/common/enums/submission.enum';
+import { ComponentType, Status } from 'src/common/enums/submission.enum';
 
 export class CreateSubmissionDto {
   @ApiProperty({
@@ -19,7 +17,7 @@ export class CreateSubmissionDto {
   })
   @IsString()
   @IsNotEmpty()
-  userId: string;
+  studentId: string;
 
   @ApiProperty({
     description: '유저 이름',
@@ -30,12 +28,12 @@ export class CreateSubmissionDto {
   studentName: string;
 
   @ApiProperty({
-    description: 'Essay writing',
-    example: 'essay writing',
+    description: '과제 주제',
+    example: 'Writing | Speaking',
   })
-  @IsString()
+  @IsEnum(ComponentType)
   @IsNotEmpty()
-  componentType: string;
+  componentType: ComponentType;
 
   @ApiProperty({
     description: '제출 상세 내용',
@@ -52,47 +50,4 @@ export class CreateSubmissionDto {
   @IsOptional()
   @IsString()
   fileUrl: string;
-
-  @ApiProperty({
-    description: '평가 상태',
-    enum: Status,
-    example: 'waiting',
-  })
-  @IsNotEmpty()
-  @IsEnum(Status)
-  status: Status;
-
-  @ApiProperty({
-    description: '평가 점수',
-    example: 90,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  @Min(0)
-  @Max(100)
-  score: number;
-
-  @ApiProperty({
-    description: '평가에 대한 AI 피드백',
-    example:
-      '발음이 훌륭하지만 속도가 매우 느리네요. 조금 더 노력하면 많이 발전할 수 있습니다.',
-  })
-  @IsOptional()
-  @IsString()
-  feedback: string;
-
-  @ApiProperty({
-    description: '평가에 대한 고칠 부분 표시',
-    example: 'abcd eda',
-  })
-  @IsOptional()
-  @IsString()
-  highlights: string;
-
-  @ApiProperty({
-    description: '파일 원본 URL에 대한 정보',
-    example: '{fileURL: file.mp4, 내용: 내용}',
-  })
-  @IsNotEmpty()
-  metadata: object;
 }

@@ -19,6 +19,9 @@ export class Submission extends BaseEntity {
   @Column()
   score: number;
 
+  @Column({ name: 'component_type' })
+  componentType: string;
+
   @Column({ unique: true })
   feedback: string;
 
