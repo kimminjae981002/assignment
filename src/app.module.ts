@@ -7,6 +7,9 @@ import { typeOrmModuleAsyncOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { SubmissionModule } from './submission/submission.module';
+import { VideoService } from './video/video.service';
+import { VideoModule } from './video/video.module';
+import { AzureModule } from './azure/azure.module';
 
 @Module({
   imports: [
@@ -18,8 +21,10 @@ import { SubmissionModule } from './submission/submission.module';
     AuthModule,
     UserModule,
     SubmissionModule,
+    VideoModule,
+    AzureModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, VideoService],
 })
 export class AppModule {}
