@@ -13,7 +13,7 @@ export class Submission extends BaseEntity {
   @Column({ name: 'file_url' })
   fileUrl: string;
 
-  @Column()
+  @Column({ default: 'waiting' })
   status: string;
 
   @Column()

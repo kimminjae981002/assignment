@@ -34,7 +34,11 @@ export class SubmissionController {
       properties: {
         studentName: { type: 'string', example: 'example' },
         studentId: { type: 'string', example: 'example123' },
-        submitText: { type: 'string', example: '열심히 했습니다!' },
+        submitText: {
+          type: 'string',
+          example:
+            'Right now, I am writing a report for my English class My classmates are preparing their presentations in the library Meanwhile, our teacher is checking the homework we submitted last week',
+        },
         componentType: { type: 'string', example: 'Speaking' },
         file: {
           type: 'string',

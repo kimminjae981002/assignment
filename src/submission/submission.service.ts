@@ -12,6 +12,8 @@ import { Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
+import { AzureOpenAIService } from 'src/azure/azure-openai.service';
+import { responseSubmission } from './interface/responseSubmissionInterface';
 
 @Injectable()
 export class SubmissionService {
@@ -23,6 +25,7 @@ export class SubmissionService {
     private readonly configService: ConfigService,
     private readonly videoService: VideoService,
     private readonly azureService: AzureService,
+    private readonly azureOpenAIService: AzureOpenAIService,
   ) {}
 
   // 과제 제출
@@ -34,10 +37,89 @@ export class SubmissionService {
     createSubmissionDto: CreateSubmissionDto,
     user: JwtPayloadInterface,
     file: Express.Multer.File,
-  ) {
+  ): Promise<responseSubmission> {
+    const startTime = Date.now();
     const { studentName, studentId, componentType, submitText } =
       createSubmissionDto;
 
+    let audioSasUrl = '';
+    let videoSasUrl = '';
+
+    // body값과 토큰 값 유저가 맞는지 확인하는 로직
+    const findUser = await this.userCheck(user, studentName, studentId);
+
+    const existComponentType = await this.submissionRepository.findOne({
+      where: { id: findUser.id, componentType },
+    });
+
+    if (existComponentType) {
+      throw new BadRequestException(
+        '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
+      );
+    }
+
+    if (!submitText) {
+      throw new BadRequestException('평가 받을 과제를 제출해주세요.');
+    }
+
+    const prompt = `당신은 영어 문법 선생님입니다. 내용에 대하여 score, feedback, highlights를 작성해주세요. 내용: ${submitText} 답변은 한국어로 부탁드리고 답변 예시 형식에 꼭 맞춰주시고 JSON 형식으로 반환해주세요.
+    답변 예시) score: 2 10점 만점 평가, feedback: 전반적으로 잘 작성했지만 부족한 부분을 말씀 드리겠습니다, highlights: ["test", "where"] 내용에 대해 강조할 부분 배열로 넣기, highlightSubmitText: 내용에 highlights에 속한 게 있다면 내용에 <b>test</b> 이런 식으로 반환해줘 내용에 넣어서 `;
+
+    // 영상 & 음성 추출
+    // Azure에 비디오 & 오디오 추출 파일 저장
+    if (file) {
+      const audio = await this.videoService.audio(file, user.userId);
+      const video = await this.videoService.videoInNoAudio(file, user.userId);
+
+      // Azure SASURL 가져오기
+      audioSasUrl = await this.azureService.uploadToAzureBlob(
+        audio,
+        user.userId,
+        'audio',
+      );
+
+      videoSasUrl = await this.azureService.uploadToAzureBlob(
+        video,
+        user.userId,
+        'video',
+      );
+    }
+
+    // ai 답변 가져오기
+    const aiAnswer = await this.azureOpenAIService.openAI(prompt);
+
+    const submission = this.submissionRepository.create({
+      ...createSubmissionDto,
+      fileUrl: file.path,
+      highlights: aiAnswer.highlights,
+      feedback: aiAnswer.feedback,
+    });
+
+    await this.submissionRepository.save(submission);
+
+    // API 호출 후 시간 기록
+    const endTime = Date.now();
+
+    // 응답 시간 측정
+    const apiLatency = endTime - startTime;
+
+    return {
+      result: 'ok',
+      message: null,
+      studentId: findUser.userId,
+      studentName: findUser.name,
+      score: aiAnswer.score,
+      feedback: aiAnswer.feedback,
+      highlights: aiAnswer.highlights,
+      highlightSubmitText: aiAnswer.highlightSubmitText,
+      submitText,
+      mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
+      apiLatency,
+    };
+  }
+
+  // api 사용하는 유저와 body 유저가 맞는지 확인하는 로직
+  async userCheck(user: any, studentName: string, studentId: string) {
     // 가드: 유저 고유아이디를 이용해 유저를 찾는다.
     const findUser: User | null = await this.userRepository.findOne({
       where: { id: user.sub },
@@ -58,42 +140,6 @@ export class SubmissionService {
         '작성한 사용자 아이디와 유저 아이디가 다릅니다.',
       );
 
-    const existComponentType = await this.submissionRepository.findOne({
-      where: { id: findUser.id, componentType },
-    });
-
-    if (existComponentType) {
-      throw new BadRequestException(
-        '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
-      );
-    }
-
-    if (!submitText) {
-      throw new BadRequestException('평가 받을 과제를 제출해주세요.');
-    }
-
-    // 영상 & 음성 추출
-    // Azure에 비디오 & 오디오 추출 파일 저장
-    if (file) {
-      const audio = await this.videoService.audio(file, user.userId);
-      const video = await this.videoService.videoInNoAudio(file, user.userId);
-
-      const audioSasUrl = await this.azureService.uploadToAzureBlob(
-        audio,
-        user.userId,
-        'audio',
-      );
-      const videoSasUrl = await this.azureService.uploadToAzureBlob(
-        video,
-        user.userId,
-        'video',
-      );
-      return {
-        mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
-      };
-    }
-
-    //     const submission = this.submissionRepository.create(createSubmissionDto);
-    //     return await this.submissionRepository.save(submission);
+    return findUser;
   }
 }
