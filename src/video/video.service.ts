@@ -34,7 +34,7 @@ export class VideoService {
     return outputAudioPath;
   }
 
-  // 오른쪽 이미지 제거 & 오디오 없는 비디오 추출
+  // 왼쪽 이미지 제거 & 오디오 없는 비디오 추출
   async videoInNoAudio(file: any, studentId: string) {
     const { uniqueFileName, filePath, studentDir } = await this.uploadPath(
       file,
@@ -46,11 +46,11 @@ export class VideoService {
       `${studentId}-${uniqueFileName}.mp4`,
     );
 
-    // 영상 오른쪽 이미지 제거 & 음성 제거
+    // 영상 왼쪽 이미지 제거 & 음성 제거
     const video: string = await new Promise((resolve, reject) => {
       ffmpeg(filePath)
         .noAudio() // 오디오 제거
-        .videoFilter('crop=iw/2:ih:0:0') // 오른쪽 이미지 제거
+        .videoFilter('crop=iw/2-10:ih:iw/2+100:0') // 왼쪽 이미지 제거
         .output(outputVideoNoAudioPath) // 이 경로에 저장한다.
         .on('end', resolve)
         .on('error', reject)
