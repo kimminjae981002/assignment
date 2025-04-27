@@ -3,7 +3,7 @@ import { AzureOpenAIService } from 'src/azure/azure-openai.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from 'src/submission/entities/submission.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Revision } from './entities/revision.entity';
 
 @Injectable()
@@ -14,6 +14,7 @@ export class RevisionService {
     @InjectRepository(Submission)
     private readonly submissionRepository: Repository<Submission>,
     private readonly azureOpenAIService: AzureOpenAIService,
+    private readonly dataSource: DataSource,
   ) {}
 
   // 재평가 요청
@@ -37,25 +38,30 @@ export class RevisionService {
     // openAI 호출 재평가 받기
     const feedbackAI = await this.azureOpenAIService.openAI(prompt);
 
-    // 재평가 시 AI 평가 업데이트
-    await this.submissionRepository.update(
-      { id: submissionId },
-      {
-        score: feedbackAI.score,
-        feedback: feedbackAI.feedback,
-        highlights: feedbackAI.highlights,
-        status: 'revised',
-      },
-    );
+    // 트랜잭션 설정
+    await this.dataSource.transaction(async (manager) => {
+      // 재평가 시 AI 평가 업데이트
+      await manager.update(
+        Submission,
+        { id: submissionId },
+        {
+          score: feedbackAI.score,
+          feedback: feedbackAI.feedback,
+          highlights: feedbackAI.highlights,
+          status: 'revised',
+        },
+      );
 
-    // 재평가 이유랑 재평가 받을지 선택 후 저장
-    const revision = await this.revisionRepository.create({
-      revision_reason,
-      isRevision,
-      submission,
+      // 재평가 이유랑 재평가 받을지 선택 후 저장
+      const revision = manager.create(Revision, {
+        revision_reason,
+        isRevision,
+        submission,
+      });
+
+      // submission DB에 저장
+      await manager.save(Revision, revision);
     });
-
-    await this.revisionRepository.save(revision);
 
     return submission;
   }
