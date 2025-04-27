@@ -1,6 +1,7 @@
 # 💬 [AI 기반 학생 영어 과제 프로젝트]
 
 > 학생이 영어 문법에 대한 과제를 제출을 하면 AI가 그에 대한 피드백을 주는 프로젝트입니다.
+
 > 음성 파일을 평가하는 기능도 개발 예정입니다.
 
 ## 📚 프로젝트 문서
@@ -25,22 +26,27 @@
 
 ## 📁 디렉터리 구조
 
+```
 src
-├── azure/ # Azure Blob Storage & Azure Open AI
-├── common/  
-├── configs/  
-├── revision/ # 재평가(Revision) 도메인
-├── submission/ # 평가 제출(Submission) 도메인
-├── uploads/ # 파일 모음
-├── user/ # 유저 도메인 (회원가입, 로그인, 인증 등)
-├── video/ # 영상 처리 로직
+├── azure/ (Azure Blob Storage & Azure Open AI)
+├── common/
+├── configs/
+├── revision/ (재평가(Revision) 도메인)
+├── submission/ (평가 제출(Submission) )
+├── uploads/ (파일 모음)
+├── user/ (유저 도메인 (회원가입, 로그인, 인증 등))
+├── video/ (영상 처리 로직)
+
+```
 
 ## 🛠️ 실행 방법
 
-1. npm install
+#### 1. npm install
 
-2. 환경변수(.env.local)
-   NODE_ENV=local
+#### 2. 환경변수(.env.local)
+
+```
+NODE_ENV=local
 
 - server port
   SERVER_PORT=number
@@ -71,5 +77,6 @@ src
   AZURE_OPENAI_DEVELOPMENT=azure_openai_development === (model)
   AZURE_OPENAI_VERSION=azure_openai_version
   AZURE_OPENAI_MODEL=azure_openai_model
+```
 
-3. npm run start:dev
+#### 3. npm run start:dev
