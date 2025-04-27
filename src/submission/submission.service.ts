@@ -240,11 +240,11 @@ export class SubmissionService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['student'],
     });
 
     if (submissions.length === 0) {
       return {
+        status: 204,
         result: submissions || [],
         message: '평가를 조회할 수 없습니다.',
       };

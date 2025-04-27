@@ -73,6 +73,16 @@ export class SubmissionController {
 
   @Get()
   @ApiOperation({ summary: '평가 전체 조회' })
+  @ApiResponse({
+    status: 204,
+    description: '평가가 아무것도 없을 때',
+    example: { result: [], message: '평가를 조회할 수 없습니다.' },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful Response',
+    type: sendSubmissionResponseDto, // 응답 DTO 클래스 지정
+  })
   async findSubmissions(
     @Query('page') page: number,
     @Query('size') size: number,
