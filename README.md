@@ -12,7 +12,11 @@
 
 ## 🧱 기술 스택
 
+- NodeJS(20)
+
 - NestJS(10)
+
+- Package Manager: NPM
 
 - TypeORM (PostgreSQL)
 
