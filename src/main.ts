@@ -5,9 +5,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // nest 로거를 winston 기반으로 체인지
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // 정적 파일 제공 설정 (uploads 폴더)
   app.useStaticAssets(path.join(__dirname, 'uploads'), {
