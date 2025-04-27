@@ -10,8 +10,8 @@ export class Submission extends BaseEntity {
   @Column({ name: 'student_id' })
   studentId: string;
 
-  @Column({ name: 'file_url' })
-  fileUrl: string;
+  @Column({ name: 'video_file' })
+  videoFile: string;
 
   @Column({ default: 'waiting' })
   status: string;

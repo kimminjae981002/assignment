@@ -36,7 +36,7 @@ export class SubmissionService {
   async sendSubmission(
     createSubmissionDto: CreateSubmissionDto,
     user: JwtPayloadInterface,
-    file: Express.Multer.File,
+    videoFile: Express.Multer.File,
   ): Promise<responseSubmission> {
     const startTime = Date.now();
     const { studentName, studentId, componentType, submitText } =
@@ -67,9 +67,12 @@ export class SubmissionService {
 
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
-    if (file) {
-      const audio = await this.videoService.audio(file, user.userId);
-      const video = await this.videoService.videoInNoAudio(file, user.userId);
+    if (videoFile) {
+      const audio = await this.videoService.audio(videoFile, user.userId);
+      const video = await this.videoService.videoInNoAudio(
+        videoFile,
+        user.userId,
+      );
 
       // Azure SASURL 가져오기
       audioSasUrl = await this.azureService.uploadToAzureBlob(
@@ -91,7 +94,7 @@ export class SubmissionService {
     // submission DB에 저장
     const submission = this.submissionRepository.create({
       ...createSubmissionDto,
-      fileUrl: 'TEST',
+      videoFile: 'TEST',
       studentId: findUser.userId,
       score: aiAnswer.score,
       highlights: aiAnswer.highlights,
