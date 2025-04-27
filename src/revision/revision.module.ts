@@ -4,9 +4,10 @@ import { RevisionController } from './revision.controller';
 import { Revision } from './entities/revision.entity';
 import { Submission } from 'src/submission/entities/submission.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AzureModule } from 'src/azure/azure.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Submission, Revision])],
+  imports: [TypeOrmModule.forFeature([Submission, Revision]), AzureModule],
   providers: [RevisionService],
   controllers: [RevisionController],
 })

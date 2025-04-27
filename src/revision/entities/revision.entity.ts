@@ -17,7 +17,7 @@ export class Revision extends BaseEntity {
   revision_reason: string;
 
   @Column()
-  revision: boolean;
+  isRevision: boolean;
 
   // submission 엔티티와 매핑
   @OneToOne(() => Submission, (submission) => submission.revision)

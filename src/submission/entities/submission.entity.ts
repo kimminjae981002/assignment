@@ -22,6 +22,9 @@ export class Submission extends BaseEntity {
   @Column({ default: 'waiting' })
   status: string;
 
+  @Column({ name: 'submit_text' })
+  submitText: string;
+
   @Column()
   score: number;
 

@@ -114,6 +114,7 @@ export class SubmissionService {
       const submission = manager.create(Submission, {
         ...createSubmissionDto,
         videoFile: videoFile ? videoFile.originalname : 'null',
+        submitText,
         status: 'complete',
         score: aiAnswer.score,
         highlights: aiAnswer.highlights,
