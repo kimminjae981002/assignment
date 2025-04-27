@@ -10,6 +10,7 @@ import { SubmissionModule } from './submission/submission.module';
 import { VideoService } from './video/video.service';
 import { VideoModule } from './video/video.module';
 import { AzureModule } from './azure/azure.module';
+import { RevisionModule } from './revision/revision.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AzureModule } from './azure/azure.module';
     SubmissionModule,
     VideoModule,
     AzureModule,
+    RevisionModule,
   ],
   controllers: [AppController],
   providers: [AppService, VideoService],
