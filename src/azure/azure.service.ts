@@ -17,7 +17,7 @@ export class AzureService {
   // Azure 클라우스 서비스에 저장하기
   async uploadToAzureBlob(
     filePath: string,
-    userId: string,
+    studentId: string,
     fileType: 'audio' | 'video',
   ): Promise<string> {
     // Azure 설정 환경변수 가져오기
@@ -49,7 +49,7 @@ export class AzureService {
       realAzureAccount,
     );
 
-    const folderName: string = userId; // 유저 아이디를 이용해 저장
+    const folderName: string = studentId; // 유저 아이디를 이용해 저장
     const fileName: string = uuidv4(); // uuid를 이용해 파일 저장
 
     // 파일 경로 설정: audio 또는 video 폴더에 저장

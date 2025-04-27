@@ -1,5 +1,5 @@
 export class JwtPayloadInterface {
   sub: number;
-  userId: string;
+  studentId: string;
   name: string;
 }

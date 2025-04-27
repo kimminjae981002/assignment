@@ -25,20 +25,20 @@ export class RevisionService {
   // 재평가 요청
   async revisionSubmission(
     createRevisionDto: CreateRevisionDto,
-    user: JwtPayloadInterface,
+    student: JwtPayloadInterface,
   ) {
     const { revision_reason, isRevision, submission_id } = createRevisionDto;
 
     const submission = await this.submissionRepository.findOne({
       where: { id: submission_id },
-      relations: ['user'],
+      relations: ['student'],
     });
 
     if (!submission) {
       throw new NotFoundException('평가를 조회할 수 없습니다.');
     }
 
-    if (submission.user.id !== user.sub) {
+    if (submission.student.id !== student.sub) {
       throw new BadRequestException('자신의 평가만 재평가 받을 수 있습니다.');
     }
 

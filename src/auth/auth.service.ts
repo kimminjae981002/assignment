@@ -1,4 +1,3 @@
-import { LoginUserDto } from './../user/dto/login-user.dto';
 import { ConfigService } from '@nestjs/config';
 import {
   ConflictException,
@@ -7,34 +6,35 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Student } from 'src/student/entities/student.entity';
+import { CreateStudentDto } from 'src/student/dto/create-student.dto';
+import { LoginStudentDto } from 'src/student/dto/login-student.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository<Student>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
 
   // 유저 회원가입
-  async signUp(createUserDto: CreateUserDto) {
-    const { userId, password, email } = createUserDto;
+  async signUp(createStudentDto: CreateStudentDto) {
+    const { studentId, password, email } = createStudentDto;
 
     // 이미 존재하는 유저 찾기
-    const existUser: User | null = await this.findUserId(userId);
+    const existStudent: Student | null = await this.findStudentId(studentId);
 
-    if (existUser) {
+    if (existStudent) {
       throw new ConflictException('해당 아이디로는 가입할 수 없습니다.');
     }
 
     // 이미 존재하는 이메일 찾기
-    const existEmail: User | null = await this.userRepository.findOne({
+    const existEmail: Student | null = await this.studentRepository.findOne({
       where: { email },
     });
 
@@ -50,13 +50,13 @@ export class AuthService {
     const hashedPassword: string = await bcrypt.hash(password, +hashRounds);
 
     // 유저 엔티티 생성
-    const newUser: User = this.userRepository.create({
-      ...createUserDto,
+    const newStudent: Student = this.studentRepository.create({
+      ...createStudentDto,
       password: hashedPassword,
     });
 
     // 유저 저장
-    await this.userRepository.save(newUser);
+    await this.studentRepository.save(newStudent);
 
     return {
       success: true,
@@ -65,18 +65,18 @@ export class AuthService {
   }
 
   // 로그인
-  async login(loginUserDto: LoginUserDto) {
-    const { userId, password } = loginUserDto;
+  async login(loginStudentDto: LoginStudentDto) {
+    const { studentId, password } = loginStudentDto;
 
     // 존재하는 유저인지 찾기
-    const user: User | null = await this.findUserId(userId);
+    const student: Student | null = await this.findStudentId(studentId);
 
-    if (!user) {
+    if (!student) {
       throw new NotFoundException('존재하지 않는 유저입니다.');
     }
 
     // 암호화 비밀번호 체크
-    const comparePassword = await bcrypt.compare(password, user.password);
+    const comparePassword = await bcrypt.compare(password, student.password);
 
     if (!comparePassword) {
       throw new UnauthorizedException('아이디 또는 비밀번호가 틀렸습니다.');
@@ -84,15 +84,15 @@ export class AuthService {
 
     // access token payload
     const accessTokenPayload = {
-      userId: user.userId,
-      sub: user.id,
+      studentId: student.studentId,
+      sub: student.id,
       tokenType: 'access',
     };
 
     // refresh token payload
     const refreshTokenPayload = {
-      userId: user.userId,
-      sub: user.id,
+      studentId: student.studentId,
+      sub: student.id,
       tokenType: 'refresh',
     };
 
@@ -114,7 +114,7 @@ export class AuthService {
   }
 
   // 유저 아이디 찾기
-  async findUserId(userId: string) {
-    return await this.userRepository.findOne({ where: { userId: userId } });
+  async findStudentId(studentId: string) {
+    return await this.studentRepository.findOne({ where: { studentId } });
   }
 }

@@ -5,12 +5,12 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { typeOrmModuleAsyncOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './user/user.module';
 import { SubmissionModule } from './submission/submission.module';
 import { VideoService } from './video/video.service';
 import { VideoModule } from './video/video.module';
 import { AzureModule } from './azure/azure.module';
 import { RevisionModule } from './revision/revision.module';
+import { StudentModule } from './student/student.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { RevisionModule } from './revision/revision.module';
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleAsyncOptions),
     AuthModule,
-    UserModule,
+    StudentModule,
     SubmissionModule,
     VideoModule,
     AzureModule,

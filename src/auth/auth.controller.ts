@@ -1,8 +1,8 @@
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { CreateStudentDto } from 'src/student/dto/create-student.dto';
+import { LoginStudentDto } from 'src/student/dto/login-student.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,8 +18,8 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   @ApiResponse({ status: 409, description: '이미 존재하는 유저' })
-  async signUp(@Body() createUserDto: CreateUserDto) {
-    return await this.authService.signUp(createUserDto);
+  async signUp(@Body() createStudentDto: CreateStudentDto) {
+    return await this.authService.signUp(createStudentDto);
   }
 
   // 로그인 API
@@ -35,7 +35,7 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.authService.login(loginUserDto);
+  async login(@Body() loginStudentDto: LoginStudentDto) {
+    return await this.authService.login(loginStudentDto);
   }
 }

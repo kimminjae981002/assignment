@@ -10,20 +10,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from './entities/submission.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
-import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import { AzureOpenAIService } from 'src/azure/azure-openai.service';
 import { responseSubmission } from './interface/responseSubmissionInterface';
 import { SubmissionMedia } from './entities/submission-media.entity';
 import { FindSubmissionsDto } from './dto/find-submission.dto';
+import { Student } from 'src/student/entities/student.entity';
 
 @Injectable()
 export class SubmissionService {
   constructor(
     @InjectRepository(Submission)
     private readonly submissionRepository: Repository<Submission>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository<Student>,
     @InjectRepository(SubmissionMedia)
     private readonly submissionMediaRepository: Repository<SubmissionMedia>,
     private readonly configService: ConfigService,
@@ -40,7 +40,7 @@ export class SubmissionService {
   //        변환된 파일은 submission_media에 저장이된다.
   async sendSubmission(
     createSubmissionDto: CreateSubmissionDto,
-    user: JwtPayloadInterface,
+    student: JwtPayloadInterface,
     videoFile: Express.Multer.File,
   ): Promise<responseSubmission> {
     const startTime = Date.now();
@@ -52,16 +52,20 @@ export class SubmissionService {
     let isVideoFile: boolean = videoFile ? true : false;
 
     // body값과 토큰 값 유저가 맞는지 확인하는 로직
-    const findUser = await this.userCheck(user, studentName, studentId);
+    const findStudent = await this.studentCheck(
+      student,
+      studentName,
+      studentId,
+    );
 
     const existComponentType = await this.submissionRepository.findOne({
       where: {
-        user: {
-          id: findUser.id, // 여기서 user 테이블의 userId를 비교
+        student: {
+          id: findStudent.id, // 여기서 student 테이블의 studentId를 비교
         },
         componentType,
       },
-      relations: ['user'],
+      relations: ['student'],
     });
 
     if (existComponentType) {
@@ -80,22 +84,22 @@ export class SubmissionService {
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
     if (isVideoFile) {
-      const audio = await this.videoService.audio(videoFile, user.userId);
+      const audio = await this.videoService.audio(videoFile, student.studentId);
       const video = await this.videoService.videoInNoAudio(
         videoFile,
-        user.userId,
+        student.studentId,
       );
 
       // Azure SASURL 가져오기
       audioSasUrl = await this.azureService.uploadToAzureBlob(
         audio,
-        user.userId,
+        student.studentId,
         'audio',
       );
 
       videoSasUrl = await this.azureService.uploadToAzureBlob(
         video,
-        user.userId,
+        student.studentId,
         'video',
       );
     }
@@ -122,7 +126,7 @@ export class SubmissionService {
         metadata: videoFile
           ? { videoFile: videoFile.originalname, path: videoFile.path }
           : { videoFile: null, path: null },
-        user: findUser,
+        student: findStudent,
       });
 
       // 평가 데이터 저장
@@ -154,8 +158,8 @@ export class SubmissionService {
     return {
       result: 'ok',
       message: null,
-      studentId: findUser.userId,
-      studentName: findUser.name,
+      studentId: findStudent.studentId,
+      studentName: findStudent.name,
       score: aiAnswer.score,
       feedback: aiAnswer.feedback,
       highlights: aiAnswer.highlights,
@@ -167,28 +171,28 @@ export class SubmissionService {
   }
 
   // api 사용하는 유저와 body 유저가 맞는지 확인하는 로직
-  async userCheck(user: any, studentName: string, studentId: string) {
+  async studentCheck(student: any, studentName: string, studentId: string) {
     // 가드: 유저 고유아이디를 이용해 유저를 찾는다.
-    const findUser: User | null = await this.userRepository.findOne({
-      where: { id: user.sub },
+    const findStudent: Student | null = await this.studentRepository.findOne({
+      where: { id: student.sub },
     });
 
-    if (!findUser) {
+    if (!findStudent) {
       throw new NotFoundException('등록되지 않은 유저입니다.');
     }
 
-    // body값과 가드 user 정보가 다르면 에러
-    if (findUser.name !== studentName)
+    // body값과 가드 Student 정보가 다르면 에러
+    if (findStudent.name !== studentName)
       throw new BadRequestException(
         '작성한 사용자 이름과 유저 이름이 다릅니다.',
       );
 
-    if (findUser.userId !== studentId)
+    if (findStudent.studentId !== studentId)
       throw new BadRequestException(
         '작성한 사용자 아이디와 유저 아이디가 다릅니다.',
       );
 
-    return findUser;
+    return findStudent;
   }
 
   // 감점 된 부분 정규식을 이용하여 강조 태그
@@ -221,11 +225,11 @@ export class SubmissionService {
     }
 
     if (studentId) {
-      whereConditions.user = { userId: studentId };
+      whereConditions.student = { studentId: studentId };
     }
 
     if (studentName) {
-      whereConditions.user = { name: studentName }; // name 추가
+      whereConditions.student = { name: studentName }; // name 추가
     }
 
     // size만큼 가져오기 , page를 계산해서 추출한다.
@@ -236,7 +240,7 @@ export class SubmissionService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['user'],
+      relations: ['student'],
     });
 
     if (submissions.length === 0) {

@@ -9,15 +9,15 @@ import * as fs from 'fs';
 @Injectable()
 export class VideoService {
   //  음성  추출
-  async audio(file: any, userId: string) {
-    const { uniqueFileName, filePath, userDir } = await this.uploadPath(
+  async audio(file: any, studentId: string) {
+    const { uniqueFileName, filePath, studentDir } = await this.uploadPath(
       file,
-      userId,
+      studentId,
     );
 
     const outputAudioPath = path.join(
-      userDir,
-      `${userId}-${uniqueFileName}.mp4`,
+      studentDir,
+      `${studentId}-${uniqueFileName}.mp4`,
     );
 
     // 음성 추출
@@ -35,15 +35,15 @@ export class VideoService {
   }
 
   // 오른쪽 이미지 제거 & 오디오 없는 비디오 추출
-  async videoInNoAudio(file: any, userId: string) {
-    const { uniqueFileName, filePath, userDir } = await this.uploadPath(
+  async videoInNoAudio(file: any, studentId: string) {
+    const { uniqueFileName, filePath, studentDir } = await this.uploadPath(
       file,
-      userId,
+      studentId,
     );
 
     const outputVideoNoAudioPath = path.join(
-      userDir,
-      `${userId}-${uniqueFileName}.mp4`,
+      studentDir,
+      `${studentId}-${uniqueFileName}.mp4`,
     );
 
     // 영상 오른쪽 이미지 제거 & 음성 제거
@@ -60,26 +60,26 @@ export class VideoService {
     return outputVideoNoAudioPath;
   }
 
-  async uploadPath(file, userId: string) {
+  async uploadPath(file, studentId: string) {
     // 업로드된 파일 경로 (절대 경로로 변환)
     const filePath = path.resolve(file.path); // 업로드된 파일의 절대 경로
     const uniqueFileName = uuidv4();
 
-    const userDir = path.join(
+    const studentDir = path.join(
       process.cwd(),
       'src',
       'uploads',
-      userId.toString(),
+      studentId.toString(),
     );
 
-    if (!fs.existsSync(userDir)) {
-      fs.mkdirSync(userDir, { recursive: true }); // 상위 디렉토리까지 자동 생성
+    if (!fs.existsSync(studentDir)) {
+      fs.mkdirSync(studentDir, { recursive: true }); // 상위 디렉토리까지 자동 생성
     }
 
     return {
       uniqueFileName,
       filePath,
-      userDir,
+      studentDir,
     };
   }
 }

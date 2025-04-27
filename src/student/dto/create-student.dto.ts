@@ -8,17 +8,17 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, UserRole } from 'src/common/enums/user.enum';
+import { Gender } from 'src/common/enums/user.enum';
 
 // 회원가입
-export class CreateUserDto {
-  @ApiProperty({ description: 'User ID', example: 'example123' })
+export class CreateStudentDto {
+  @ApiProperty({ description: 'Student ID', example: 'example123' })
   @IsNotEmpty()
   @MinLength(5, { message: '아이디는 최소 5자 이상이어야 합니다.' })
   @MaxLength(20, { message: '아이디는 최대 20자 이하이어야 합니다.' })
-  userId: string;
+  studentId: string;
 
-  @ApiProperty({ description: 'User Password', example: 'Example123!' })
+  @ApiProperty({ description: 'Student Password', example: 'Example123!' })
   @IsNotEmpty()
   @MinLength(8, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
   @MaxLength(20, { message: '비밀번호는 최대 20자 이하이어야 합니다.' })

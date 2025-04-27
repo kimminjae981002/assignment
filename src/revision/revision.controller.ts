@@ -12,7 +12,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { RevisionService } from './revision.service';
 import { CreateRevisionDto } from './dto/create-revision.dto';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { CurrentStudent } from 'src/common/decorators/current-student.decorator';
 
 @Controller('revision')
 @UseGuards(JwtAuthGuard)
@@ -24,11 +24,11 @@ export class RevisionController {
   @ApiOperation({ summary: '재평가 제출' })
   async revisionSubmission(
     @Body() createRevisionDto: CreateRevisionDto,
-    @CurrentUser() user: JwtPayloadInterface,
+    @CurrentStudent() student: JwtPayloadInterface,
   ) {
     return await this.revisionService.revisionSubmission(
       createRevisionDto,
-      user,
+      student,
     );
   }
 
