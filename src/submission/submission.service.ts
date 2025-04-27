@@ -8,12 +8,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Submission } from './entities/submission.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { User } from 'src/user/entities/user.entity';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import { AzureOpenAIService } from 'src/azure/azure-openai.service';
 import { responseSubmission } from './interface/responseSubmissionInterface';
+import { SubmissionMedia } from './entities/submission-media.entity';
 
 @Injectable()
 export class SubmissionService {
@@ -22,10 +23,13 @@ export class SubmissionService {
     private readonly submissionRepository: Repository<Submission>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(SubmissionMedia)
+    private readonly submissionMediaRepository: Repository<SubmissionMedia>,
     private readonly configService: ConfigService,
     private readonly videoService: VideoService,
     private readonly azureService: AzureService,
     private readonly azureOpenAIService: AzureOpenAIService,
+    private readonly dataSource: DataSource,
   ) {}
 
   // 과제 제출
@@ -44,6 +48,7 @@ export class SubmissionService {
 
     let audioSasUrl = '';
     let videoSasUrl = '';
+    let isVideoFile: boolean = videoFile ? true : false;
 
     // body값과 토큰 값 유저가 맞는지 확인하는 로직
     const findUser = await this.userCheck(user, studentName, studentId);
@@ -52,11 +57,11 @@ export class SubmissionService {
       where: { studentId: findUser.userId, componentType },
     });
 
-    if (existComponentType) {
-      throw new BadRequestException(
-        '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
-      );
-    }
+    // if (existComponentType) {
+    //   throw new BadRequestException(
+    //     '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
+    //   );
+    // }
 
     if (!submitText) {
       throw new BadRequestException('평가 받을 과제를 제출해주세요.');
@@ -67,7 +72,7 @@ export class SubmissionService {
 
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
-    if (videoFile) {
+    if (isVideoFile) {
       const audio = await this.videoService.audio(videoFile, user.userId);
       const video = await this.videoService.videoInNoAudio(
         videoFile,
@@ -96,21 +101,39 @@ export class SubmissionService {
       aiAnswer.highlights,
     );
 
-    // submission DB에 저장
-    const submission = this.submissionRepository.create({
-      ...createSubmissionDto,
-      videoFile: videoFile ? videoFile.originalname : 'null',
-      studentId: findUser.userId,
-      score: aiAnswer.score,
-      highlights: aiAnswer.highlights,
-      feedback: aiAnswer.feedback,
-      metadata: videoFile
-        ? { videoFile: videoFile.originalname, path: videoFile.path }
-        : { videoFile: null, path: null },
-      user: findUser,
-    });
+    // 트랜잭션을 사용하여 데이터 저장 무결성 확보
+    await this.dataSource.transaction(async (manager) => {
+      // submission DB에 저장
+      const submission = manager.create(Submission, {
+        ...createSubmissionDto,
+        videoFile: videoFile ? videoFile.originalname : 'null',
+        studentId: findUser.userId,
+        score: aiAnswer.score,
+        highlights: aiAnswer.highlights,
+        feedback: aiAnswer.feedback,
+        metadata: videoFile
+          ? { videoFile: videoFile.originalname, path: videoFile.path }
+          : { videoFile: null, path: null },
+        user: findUser,
+      });
 
-    await this.submissionRepository.save(submission);
+      await manager.save(Submission, submission);
+
+      if (isVideoFile) {
+        const submissionMedia = manager.create(SubmissionMedia, {
+          azure_mp3_url: audioSasUrl,
+          azure_mp4_url: videoSasUrl,
+          metadata: {
+            audioSasUrl: '오디오만 추출한 URL입니다.',
+            videoSasUrl:
+              '오른쪽 이미지를 제거한 동영상 파일입니다.(음성이 없습니다.)',
+          },
+          submission,
+        });
+
+        await manager.save(SubmissionMedia, submissionMedia);
+      }
+    });
 
     // API 호출 후 시간 기록
     const endTime = Date.now();

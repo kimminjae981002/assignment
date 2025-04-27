@@ -1,6 +1,14 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { SubmissionMedia } from './submission-media.entity';
 
 @Entity('submissions')
 export class Submission extends BaseEntity {
@@ -33,5 +41,13 @@ export class Submission extends BaseEntity {
 
   // ManyToOne 관계를 통해 User 엔티티와 매핑
   @ManyToOne(() => User, (user) => user.submissions)
+  @JoinColumn({ name: 'user_id' })
   user: User; // 이 필드는 외래 키인 userId와 자동으로 연결됩니다.
+
+  // submission media 엔티티와 매핑
+  @OneToOne(
+    () => SubmissionMedia,
+    (submissionMedia) => submissionMedia.submission,
+  )
+  submissionMedia: SubmissionMedia; // 이 필드는 외래 키인 submission_media id와 자동으로 연결됩니다.
 }

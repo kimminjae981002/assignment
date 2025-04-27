@@ -7,10 +7,11 @@ import { SubmissionController } from './submission.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { VideoModule } from 'src/video/video.module';
 import { AzureModule } from 'src/azure/azure.module';
+import { SubmissionMedia } from './entities/submission-media.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Submission, User]),
+    TypeOrmModule.forFeature([Submission, User, SubmissionMedia]),
     MulterModule.register({ dest: '/uploads' }),
     VideoModule,
     AzureModule,
