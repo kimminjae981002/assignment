@@ -12,15 +12,13 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 export class RevisionController {
   constructor(private readonly revisionService: RevisionService) {}
 
-  @Post(':submissionId')
+  @Post()
   @ApiOperation({ summary: '재평가 제출' })
   async revisionSubmission(
-    @Param('submissionId') submissionId: number,
     @Body() createRevisionDto: CreateRevisionDto,
     @CurrentUser() user: JwtPayloadInterface,
   ) {
     return await this.revisionService.revisionSubmission(
-      submissionId,
       createRevisionDto,
       user,
     );

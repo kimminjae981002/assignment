@@ -24,14 +24,13 @@ export class RevisionService {
 
   // 재평가 요청
   async revisionSubmission(
-    submissionId: number,
     createRevisionDto: CreateRevisionDto,
     user: JwtPayloadInterface,
   ) {
-    const { revision_reason, isRevision } = createRevisionDto;
+    const { revision_reason, isRevision, submission_id } = createRevisionDto;
 
     const submission = await this.submissionRepository.findOne({
-      where: { id: submissionId },
+      where: { id: submission_id },
       relations: ['user'],
     });
 
@@ -54,7 +53,7 @@ export class RevisionService {
       // 재평가 시 AI 평가 업데이트
       await manager.update(
         Submission,
-        { id: submissionId },
+        { id: submission_id },
         {
           score: feedbackAI.score,
           feedback: feedbackAI.feedback,
