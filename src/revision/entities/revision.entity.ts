@@ -4,7 +4,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -19,12 +19,8 @@ export class Revision extends BaseEntity {
   @Column()
   isRevision: boolean;
 
-  // submission_id 컬럼을 명시적으로 추가하여 외래 키가 올바르게 생성되도록 함
-  @Column({ name: 'submission_id', nullable: true })
-  submissionId: number;
-
   // submission 엔티티와 매핑
-  @OneToOne(() => Submission, (submission) => submission.revision)
+  @ManyToOne(() => Submission, (submission) => submission.revision)
   @JoinColumn({ name: 'submission_id' })
   submission: Submission; // 이 필드는 외래 키인 submission와 자동으로 연결됩니다.
 }
