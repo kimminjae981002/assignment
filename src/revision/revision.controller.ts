@@ -1,4 +1,12 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 import { RevisionService } from './revision.service';
@@ -22,5 +30,14 @@ export class RevisionController {
       createRevisionDto,
       user,
     );
+  }
+
+  @Get()
+  @ApiOperation({ summary: '재평가 전체 조회' })
+  async findRevisions(
+    @Query('page') page: number,
+    @Query('size') size: number,
+  ) {
+    return await this.revisionService.findRevisions(page, size);
   }
 }

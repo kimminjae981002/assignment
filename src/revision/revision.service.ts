@@ -75,4 +75,26 @@ export class RevisionService {
 
     return { result: 'ok', message: '해당 평가에 대해 재평가 되었습니다. ' };
   }
+
+  // 재평가 조회
+  async findRevisions(page: number, size: number) {
+    // size만큼 가져오기 , page를 계산해서 추출한다.
+    const revisions = await this.revisionRepository.find({
+      take: size || 20,
+      skip: (page - 1) * size,
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['submission'],
+    });
+
+    if (revisions.length === 0) {
+      return {
+        result: revisions || [],
+        message: '재평가를 조회할 수 없습니다.',
+      };
+    }
+
+    return revisions;
+  }
 }
