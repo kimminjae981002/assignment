@@ -64,11 +64,11 @@ export class SubmissionService {
       relations: ['user'],
     });
 
-    // if (existComponentType) {
-    //   throw new BadRequestException(
-    //     '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
-    //   );
-    // }
+    if (existComponentType) {
+      throw new BadRequestException(
+        '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
+      );
+    }
 
     if (!submitText) {
       throw new BadRequestException('평가 받을 과제를 제출해주세요.');
