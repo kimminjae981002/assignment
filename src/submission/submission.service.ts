@@ -117,8 +117,10 @@ export class SubmissionService {
         user: findUser,
       });
 
+      // 평가 데이터 저장
       await manager.save(Submission, submission);
 
+      // 평가 중 file 변환 된 것 저장 - 파일이 있을 시에
       if (isVideoFile) {
         const submissionMedia = manager.create(SubmissionMedia, {
           azure_mp3_url: audioSasUrl,
