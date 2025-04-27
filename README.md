@@ -12,9 +12,9 @@
 
 ## 🧱 기술 스택
 
-- NodeJS(20)
+- NodeJS(20.19.0)
 
-- NestJS(10)
+- NestJS(10.4.9)
 
 - Package Manager: NPM
 

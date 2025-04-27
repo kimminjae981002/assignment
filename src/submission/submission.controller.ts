@@ -3,6 +3,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import {
@@ -22,6 +23,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FindSubmissionsDto } from './dto/find-submission.dto';
+import { sendSubmissionResponseDto } from './dto/send-submission-response.dto';
 
 @Controller('submissions')
 @UseGuards(JwtAuthGuard)
@@ -32,6 +34,11 @@ export class SubmissionController {
   @Post()
   @ApiOperation({ summary: '평가 제출' })
   @ApiConsumes('multipart/form-data')
+  @ApiResponse({
+    status: 200,
+    description: 'Successful Response',
+    type: sendSubmissionResponseDto, // 응답 DTO 클래스 지정
+  })
   @ApiBody({
     schema: {
       type: 'object',
