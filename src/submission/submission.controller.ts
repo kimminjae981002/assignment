@@ -9,6 +9,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -75,5 +76,11 @@ export class SubmissionController {
       size,
       findSubmissionsDto,
     );
+  }
+
+  @Get(':submissionId')
+  @ApiOperation({ summary: '평가 상세 조회' })
+  async findSubmission(@Param('submissionId') submissionId: number) {
+    return await this.submissionsService.findSubmission(submissionId);
   }
 }

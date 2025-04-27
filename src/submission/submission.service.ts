@@ -237,7 +237,26 @@ export class SubmissionService {
       },
       relations: ['user'],
     });
-    console.log(submissions);
+
+    if (submissions.length === 0) {
+      return {
+        result: submissions || [],
+        message: '평가를 조회할 수 없습니다.',
+      };
+    }
+
     return submissions;
+  }
+
+  // 평가 상세 조회
+  async findSubmission(submissionId: number) {
+    const submission = await this.submissionRepository.findOne({
+      where: { id: submissionId },
+    });
+
+    if (!submission) {
+      throw new BadRequestException('평가가 존재하지 않습니다.');
+    }
+    return submission;
   }
 }
