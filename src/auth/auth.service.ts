@@ -23,7 +23,7 @@ export class AuthService {
   ) {}
 
   // 유저 회원가입
-  async signUp(createUserDto: CreateUserDto): Promise<User> {
+  async signUp(createUserDto: CreateUserDto) {
     const { userId, password, email } = createUserDto;
 
     // 이미 존재하는 유저 찾기
@@ -56,7 +56,12 @@ export class AuthService {
     });
 
     // 유저 저장
-    return await this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
+
+    return {
+      success: true,
+      message: '회원가입에 성공했습니다.',
+    };
   }
 
   // 로그인

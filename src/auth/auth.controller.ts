@@ -11,7 +11,11 @@ export class AuthController {
   // 회원가입 API
   @Post('signUp')
   @ApiOperation({ summary: '회원가입' })
-  @ApiResponse({ status: 201, description: '회원가입 성공' })
+  @ApiResponse({
+    status: 201,
+    description: '회원가입 성공',
+    example: { success: true, message: '회원가입에 성공했습니다.' },
+  })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   @ApiResponse({ status: 409, description: '이미 존재하는 유저' })
   async signUp(@Body() createUserDto: CreateUserDto) {
@@ -21,7 +25,15 @@ export class AuthController {
   // 로그인 API
   @Post('login')
   @ApiOperation({ summary: '로그인' })
-  @ApiResponse({ status: 201, description: '로그인 성공' })
+  @ApiResponse({
+    status: 201,
+    description: '로그인 성공',
+    example: {
+      success: true,
+      accessToken: 'eiAvlsioVAA...',
+      refreshToken: 'eyaACVao',
+    },
+  })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   async login(@Body() loginUserDto: LoginUserDto) {
     return await this.authService.login(loginUserDto);
