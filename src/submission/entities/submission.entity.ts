@@ -15,9 +15,6 @@ export class Submission extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'student_id' })
-  studentId: string;
-
   @Column({ name: 'video_file', nullable: true })
   videoFile: string;
 

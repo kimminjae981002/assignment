@@ -15,6 +15,7 @@ import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import { AzureOpenAIService } from 'src/azure/azure-openai.service';
 import { responseSubmission } from './interface/responseSubmissionInterface';
 import { SubmissionMedia } from './entities/submission-media.entity';
+import { FindSubmissionsDto } from './dto/find-submission.dto';
 
 @Injectable()
 export class SubmissionService {
@@ -54,7 +55,13 @@ export class SubmissionService {
     const findUser = await this.userCheck(user, studentName, studentId);
 
     const existComponentType = await this.submissionRepository.findOne({
-      where: { studentId: findUser.userId, componentType },
+      where: {
+        user: {
+          id: findUser.id, // 여기서 user 테이블의 userId를 비교
+        },
+        componentType,
+      },
+      relations: ['user'],
     });
 
     // if (existComponentType) {
@@ -107,7 +114,7 @@ export class SubmissionService {
       const submission = manager.create(Submission, {
         ...createSubmissionDto,
         videoFile: videoFile ? videoFile.originalname : 'null',
-        studentId: findUser.userId,
+        status: 'complete',
         score: aiAnswer.score,
         highlights: aiAnswer.highlights,
         feedback: aiAnswer.feedback,
@@ -195,5 +202,42 @@ export class SubmissionService {
       submitText = submitText.replace(regex, (match) => `<b>${match}</b>`);
     });
     return submitText;
+  }
+
+  // 학생 제출 결과 전체 조회
+  async findSubmissions(
+    page: number,
+    size: number,
+    findSubmissionsDto: FindSubmissionsDto,
+  ) {
+    const { status, studentId, studentName } = findSubmissionsDto;
+    // 조건을 동적으로 설정
+    const whereConditions: any = {};
+
+    // 각 파라미터가 존재하면 해당 조건을 추가
+    if (status) {
+      whereConditions.status = status;
+    }
+
+    if (studentId) {
+      whereConditions.user = { userId: studentId };
+    }
+
+    if (studentName) {
+      whereConditions.user = { name: studentName }; // name 추가
+    }
+
+    // size만큼 가져오기 , page를 계산해서 추출한다.
+    const submissions = await this.submissionRepository.find({
+      take: size || 20,
+      skip: (page - 1) * size, // 페이지네이션을 위한 skip 계산
+      where: whereConditions, // 동적으로 생성된 where 조건 적용
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['user'],
+    });
+    console.log(submissions);
+    return submissions;
   }
 }

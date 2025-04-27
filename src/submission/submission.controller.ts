@@ -8,7 +8,9 @@ import { CreateSubmissionDto } from './dto/create-submission.dto';
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -18,6 +20,7 @@ import { SubmissionService } from './submission.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FindSubmissionsDto } from './dto/find-submission.dto';
 
 @Controller('submissions')
 @UseGuards(JwtAuthGuard)
@@ -26,7 +29,7 @@ export class SubmissionController {
   constructor(private readonly submissionsService: SubmissionService) {}
 
   @Post()
-  @ApiOperation({ summary: '과제 제출' })
+  @ApiOperation({ summary: '평가 제출' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -57,6 +60,20 @@ export class SubmissionController {
       createSubmissionDto,
       user,
       file,
+    );
+  }
+
+  @Get()
+  @ApiOperation({ summary: '평가 전체 조회' })
+  async findSubmissions(
+    @Query('page') page: number,
+    @Query('size') size: number,
+    @Query() findSubmissionsDto: FindSubmissionsDto,
+  ) {
+    return await this.submissionsService.findSubmissions(
+      page,
+      size,
+      findSubmissionsDto,
     );
   }
 }
