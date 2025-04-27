@@ -90,6 +90,7 @@ export class RevisionService {
 
     if (revisions.length === 0) {
       return {
+        status: 204,
         result: revisions || [],
         message: '재평가를 조회할 수 없습니다.',
       };
