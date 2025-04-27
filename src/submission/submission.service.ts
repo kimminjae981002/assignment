@@ -63,7 +63,7 @@ export class SubmissionService {
     }
 
     const prompt = `당신은 영어 문법 선생님입니다. 내용에 대하여 score, feedback, highlights를 작성해주세요. 내용: ${submitText} 답변은 한국어로 부탁드리고 답변 예시 형식에 꼭 맞춰주시고 JSON 형식으로 반환해주세요.
-    답변 예시) score: 2 10점 만점 평가, feedback: 전반적으로 잘 작성했지만 부족한 부분을 말씀 드리겠습니다, highlights: ["test", "where"] 내용에 대해 감전한 부분을 배열로 넣기, highlightSubmitText: 내용에 highlights에 속한 게 있다면 내용에 <b>test</b> 이런 식으로 반환해줘 내용에 넣어서 `;
+    답변 예시) score: 2 10점 만점 평가, feedback: 전반적으로 잘 작성했지만 부족한 부분을 말씀 드리겠습니다, highlights: ["test", "where"] 내용에 대해 감전한 부분을 배열로 넣기`;
 
     // 영상 & 음성 추출
     // Azure에 비디오 & 오디오 추출 파일 저장
@@ -90,6 +90,11 @@ export class SubmissionService {
 
     // ai 답변 가져오기
     const aiAnswer = await this.azureOpenAIService.openAI(prompt);
+
+    const highlightSubmitText = await this.highlightSubmitText(
+      submitText,
+      aiAnswer.highlights,
+    );
 
     // submission DB에 저장
     const submission = this.submissionRepository.create({
@@ -121,7 +126,7 @@ export class SubmissionService {
       score: aiAnswer.score,
       feedback: aiAnswer.feedback,
       highlights: aiAnswer.highlights,
-      highlightSubmitText: aiAnswer.highlightSubmitText,
+      highlightSubmitText,
       submitText,
       mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
       apiLatency,
@@ -151,5 +156,19 @@ export class SubmissionService {
       );
 
     return findUser;
+  }
+
+  // 감점 된 부분 정규식을 이용하여 강조 태그
+  async highlightSubmitText(submitText: string, highlights: string[]) {
+    highlights.forEach((word) => {
+      // 감점 부분 단어 꺼내오기
+      // 특수문자를 문자로 찾아온다.
+      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      // submitText에서 검색하여 그 값에 강조 태그 넣어준다.
+      const regex = new RegExp(escaped, 'gi');
+      submitText = submitText.replace(regex, (match) => `<b>${match}</b>`);
+    });
+    return submitText;
   }
 }

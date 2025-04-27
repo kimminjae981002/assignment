@@ -66,7 +66,6 @@ export class AzureOpenAIService {
         !parsedResponse.feedback ||
         !parsedResponse.highlights ||
         !parsedResponse.score ||
-        !parsedResponse.highlightSubmitText ||
         typeof parsedResponse !== 'object'
       ) {
         throw new BadRequestException(
@@ -78,7 +77,6 @@ export class AzureOpenAIService {
         score: parsedResponse.score,
         feedback: parsedResponse.feedback,
         highlights: parsedResponse.highlights,
-        highlightSubmitText: parsedResponse.highlightSubmitText,
       };
     } catch (error) {
       console.error(`error: `, error);
