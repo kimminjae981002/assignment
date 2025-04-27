@@ -40,4 +40,10 @@ export class RevisionController {
   ) {
     return await this.revisionService.findRevisions(page, size);
   }
+
+  @Get(':revisionId')
+  @ApiOperation({ summary: '재평가 상세 조회' })
+  async findRevision(@Param('revisionId') revisionId: number) {
+    return await this.revisionService.findRevision(revisionId);
+  }
 }

@@ -97,4 +97,23 @@ export class RevisionService {
 
     return revisions;
   }
+
+  // 재평가 조회
+  async findRevision(revisionId: number) {
+    const revision = await this.revisionRepository.findOne({
+      where: {
+        id: revisionId,
+      },
+      relations: ['submission'],
+    });
+
+    if (!revision) {
+      return {
+        result: false,
+        message: '재평가를 조회할 수 없습니다.',
+      };
+    }
+
+    return revision;
+  }
 }
