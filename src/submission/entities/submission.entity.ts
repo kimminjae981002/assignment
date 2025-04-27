@@ -10,7 +10,7 @@ export class Submission extends BaseEntity {
   @Column({ name: 'student_id' })
   studentId: string;
 
-  @Column({ name: 'video_file' })
+  @Column({ name: 'video_file', nullable: true })
   videoFile: string;
 
   @Column({ default: 'waiting' })
@@ -22,7 +22,7 @@ export class Submission extends BaseEntity {
   @Column({ name: 'component_type' })
   componentType: string;
 
-  @Column({ unique: true })
+  @Column()
   feedback: string;
 
   @Column({ nullable: true })
