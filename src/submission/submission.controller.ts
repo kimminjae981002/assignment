@@ -24,6 +24,7 @@ import { JwtPayloadInterface } from 'src/auth/interface/jwt-payload.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FindSubmissionsDto } from './dto/find-submission.dto';
 import { sendSubmissionResponseDto } from './dto/send-submission-response.dto';
+import { SubmissionResponseDto } from './dto/submission-response.dto';
 
 @Controller('submissions')
 @UseGuards(JwtAuthGuard)
@@ -96,6 +97,20 @@ export class SubmissionController {
   }
 
   @Get(':submissionId')
+  @ApiResponse({
+    status: 400,
+    description: '평가가 아무것도 없을 때',
+    example: {
+      message: '평가가 존재하지 않습니다. ',
+      error: 'Bad Request',
+      statusCode: 400,
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful Response',
+    type: SubmissionResponseDto, // 응답 DTO 클래스 지정
+  })
   @ApiOperation({ summary: '평가 상세 조회' })
   async findSubmission(@Param('submissionId') submissionId: number) {
     return await this.submissionsService.findSubmission(submissionId);

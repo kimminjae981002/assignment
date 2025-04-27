@@ -260,10 +260,7 @@ export class SubmissionService {
     });
 
     if (!submission) {
-      return {
-        result: false,
-        message: '평가를 조회할 수 없습니다.',
-      };
+      throw new BadRequestException('평가가 존재하지 않습니다.');
     }
     return submission;
   }
