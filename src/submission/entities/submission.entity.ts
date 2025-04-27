@@ -4,12 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SubmissionMedia } from './submission-media.entity';
 import { Revision } from 'src/revision/entities/revision.entity';
 import { Student } from 'src/student/entities/student.entity';
+import { SubmissionLog } from './submission-log.entity';
 
 @Entity('submissions')
 export class Submission extends BaseEntity {
@@ -53,6 +55,10 @@ export class Submission extends BaseEntity {
   submissionMedia: SubmissionMedia; // 이 필드는 외래 키인 submission_media id와 자동으로 연결됩니다.
 
   // revision 엔티티와 매핑
-  @OneToOne(() => Revision, (revision) => revision.submission)
+  @OneToMany(() => Revision, (revision) => revision.submission)
   revision: Revision; // 이 필드는 외래 키인 revision id와 자동으로 연결됩니다.
+
+  // submission media 엔티티와 매핑
+  @OneToOne(() => SubmissionLog, (submissionLog) => submissionLog.submission)
+  submissionLog: SubmissionLog; // 이 필드는 외래 키인 submission_media id와 자동으로 연결됩니다.
 }

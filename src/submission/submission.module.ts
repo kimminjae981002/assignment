@@ -8,10 +8,16 @@ import { VideoModule } from 'src/video/video.module';
 import { AzureModule } from 'src/azure/azure.module';
 import { SubmissionMedia } from './entities/submission-media.entity';
 import { Student } from 'src/student/entities/student.entity';
+import { SubmissionLog } from './entities/submission-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Submission, Student, SubmissionMedia]),
+    TypeOrmModule.forFeature([
+      Submission,
+      Student,
+      SubmissionMedia,
+      SubmissionLog,
+    ]),
     MulterModule.register({ dest: '/uploads' }),
     VideoModule,
     AzureModule,
