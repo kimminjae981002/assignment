@@ -37,4 +37,3 @@ jobs:
           npm install
           npm run build
           pm2 reload dist/main.js --name "nest-server"
-          EOF
