@@ -1,6 +1,6 @@
 name: CI/CD Pipeline
 
-# main branch에 push or pr할 때 실행된다.
+# master 브랜치에 push나 pull request가 있을 때 실행된다.
 on:
   push:
     branches:
@@ -25,11 +25,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-        # EC2 KEY
+      # EC2 키 설정
       - name: Setup SSH key
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" > key-pair-secret.pem
           chmod 600 key-pair-secret.pem
 
-
-          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "pm2 reload dist/main.js --name "nest-server""
+      # SSH로 EC2에 접속하여 pm2 서버 재시작
+      - name: Reload PM2 on EC2
+        run: |
+          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "pm2 reload dist/main.js --name 'nest-server'"
