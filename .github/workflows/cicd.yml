@@ -31,7 +31,7 @@ jobs:
       # ubuntu 접속 및 코드 최신화 재실행
       - name: SSH to EC2 and update code
         run: |
-          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "
+          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }}
           cd /home/ubuntu/assignment &&
           pm2 kill &&
           git pull origin master &&
