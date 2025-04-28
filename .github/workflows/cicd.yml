@@ -35,5 +35,8 @@ jobs:
           cd /home/ubuntu/assignment
           git pull origin master
           npm install
+          # 업로드 디렉토리 권한 수정
+          sudo chmod -R 775 /uploads
+          sudo chown -R ubuntu:ubuntu /uploads
           pm2 reload nest-server
           EOF
