@@ -20,8 +20,12 @@ export const typeOrmModuleAsyncOptions: TypeOrmModuleAsyncOptions = {
     autoLoadEntities: true,
     entities: [Student, Submission, SubmissionMedia, Revision, SubmissionLog],
     logging: false,
+<<<<<<< HEAD
+    ssl: {rejectUnauthorized: false},
+=======
     ssl: {
       rejectUnauthorized: false,
     },
+>>>>>>> 740b9dabf19aca6efd32c9200cd1681898d83781
   }),
 };
