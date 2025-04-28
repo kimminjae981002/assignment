@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+# main branch에 push or pr할 때 실행된다.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+        # EC2 KEY
+      - name: Setup SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key-pair-secret.pem
+          chmod 600 key-pair-secret.pem
+
+
+          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "pm2 reload dist/main.js --name "nest-server""
