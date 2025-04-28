@@ -1,8 +1,8 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
+import { SubmissionLog } from 'src/logger/entities/submission-log.entity';
 import { Revision } from 'src/revision/entities/revision.entity';
 import { Student } from 'src/student/entities/student.entity';
-import { SubmissionLog } from 'src/submission/entities/submission-log.entity';
 import { SubmissionMedia } from 'src/submission/entities/submission-media.entity';
 import { Submission } from 'src/submission/entities/submission.entity';
 

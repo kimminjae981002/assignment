@@ -11,7 +11,7 @@ import {
 import { SubmissionMedia } from './submission-media.entity';
 import { Revision } from 'src/revision/entities/revision.entity';
 import { Student } from 'src/student/entities/student.entity';
-import { SubmissionLog } from './submission-log.entity';
+import { SubmissionLog } from 'src/logger/entities/submission-log.entity';
 
 @Entity('submissions')
 export class Submission extends BaseEntity {

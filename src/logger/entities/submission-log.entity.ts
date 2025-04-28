@@ -6,8 +6,8 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Submission } from './submission.entity';
 import { Revision } from 'src/revision/entities/revision.entity';
+import { Submission } from 'src/submission/entities/submission.entity';
 
 @Entity('submission_logs')
 export class SubmissionLog {
@@ -23,7 +23,10 @@ export class SubmissionLog {
   @Column()
   result: 'success' | 'failed';
 
-  @Column({ nullable: true })
+  @Column({ name: 'api_end_point' })
+  apiEndPoint: string;
+
+  @Column()
   message: string;
 
   @CreateDateColumn()

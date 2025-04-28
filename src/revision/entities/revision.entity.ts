@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { SubmissionLog } from 'src/submission/entities/submission-log.entity';
+import { SubmissionLog } from 'src/logger/entities/submission-log.entity';
+
 import { Submission } from 'src/submission/entities/submission.entity';
 import {
   Column,

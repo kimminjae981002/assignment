@@ -1,6 +1,6 @@
+import { SubmissionLogService } from './../logger/submission-log.service';
 import { AzureService } from './../azure/azure.service';
 import { VideoService } from './../video/video.service';
-import { ConfigService } from '@nestjs/config';
 import {
   BadRequestException,
   Injectable,
@@ -24,31 +24,24 @@ export class SubmissionService {
     private readonly submissionRepository: Repository<Submission>,
     @InjectRepository(Student)
     private readonly studentRepository: Repository<Student>,
-    @InjectRepository(SubmissionMedia)
-    private readonly submissionMediaRepository: Repository<SubmissionMedia>,
-    private readonly configService: ConfigService,
     private readonly videoService: VideoService,
     private readonly azureService: AzureService,
     private readonly azureOpenAIService: AzureOpenAIService,
     private readonly dataSource: DataSource,
+    private readonly submissionLogService: SubmissionLogService,
   ) {}
 
   // 과제 제출
-  // 흐름: 학생이 과제를 제출한다.(제출할 때는, sId, sName, type, text, file이 필요하다.)
-  //       제출을 하면 AI가 파일을 읽고 피드백을 해준다.
-  //       submissions 디비에 저장되며, 비디오 파일이 이미지 제거, 동영상 음성 제거 및 음성 파일로 변환이 된다.
-  //        변환된 파일은 submission_media에 저장이된다.
   async sendSubmission(
     createSubmissionDto: CreateSubmissionDto,
     student: JwtPayloadInterface,
     videoFile: Express.Multer.File,
   ): Promise<responseSubmission> {
     const startTime = Date.now();
+
     const { studentName, studentId, componentType, submitText } =
       createSubmissionDto;
 
-    let audioSasUrl = '';
-    let videoSasUrl = '';
     let isVideoFile: boolean = videoFile ? true : false;
 
     // body값과 토큰 값 유저가 맞는지 확인하는 로직
@@ -58,62 +51,82 @@ export class SubmissionService {
       studentId,
     );
 
-    const existComponentType = await this.submissionRepository.findOne({
-      where: {
-        student: {
-          id: findStudent.id, // 여기서 student 테이블의 studentId를 비교
-        },
-        componentType,
-      },
-      relations: ['student'],
-    });
-
-    // if (existComponentType) {
-    //   throw new BadRequestException(
-    //     '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
-    //   );
-    // }
-
     if (!submitText) {
       throw new BadRequestException('평가 받을 과제를 제출해주세요.');
     }
 
-    const prompt = `당신은 영어 문법 선생님입니다. 내용에 대하여 score, feedback, highlights를 작성해주세요. 내용: ${submitText} 답변은 한국어로 부탁드리고 답변 예시 형식에 꼭 맞춰주시고 JSON 형식으로 반환해주세요.
-    답변 예시) score: 2 10점 만점 평가, feedback: 전반적으로 잘 작성했지만 부족한 부분을 말씀 드리겠습니다, highlights: ["test", "where"] 내용에 대해 감전한 부분을 배열로 넣기`;
+    await this.checkComponentType(findStudent, componentType);
 
     // 영상 & 음성 추출
-    // Azure에 비디오 & 오디오 추출 파일 저장
-    if (isVideoFile) {
-      const audio = await this.videoService.audio(videoFile, student.studentId);
-      const video = await this.videoService.videoInNoAudio(
-        videoFile,
-        student.studentId,
-      );
+    const { audioSasUrl, videoSasUrl } = await this.processFiles(
+      videoFile,
+      findStudent.studentId,
+    );
 
-      // Azure SASURL 가져오기
-      audioSasUrl = await this.azureService.uploadToAzureBlob(
-        audio,
-        student.studentId,
-        'audio',
-      );
+    // ai answer 가져오기
+    const aiAnswer = await this.getAiAnswer(submitText);
 
-      videoSasUrl = await this.azureService.uploadToAzureBlob(
-        video,
-        student.studentId,
-        'video',
-      );
-    }
-
-    // ai 답변 가져오기
-    const aiAnswer = await this.azureOpenAIService.openAI(prompt);
-
+    // 감점 부분 강조 태그
     const highlightSubmitText = await this.highlightSubmitText(
       submitText,
       aiAnswer.highlights,
     );
 
+    // API 호출 후 시간 기록
+    const endTime = Date.now();
+
+    // 응답 시간 측정
+    const apiLatency = endTime - startTime;
+
+    // db 작업 트랜잭션 로직
+    const submission = await this.createTransaction(
+      createSubmissionDto,
+      videoFile,
+      submitText,
+      aiAnswer,
+      findStudent,
+      isVideoFile,
+      audioSasUrl,
+      videoSasUrl,
+    );
+
+    // createSubmission 호출 (로그 기록)
+    await this.submissionLogService.saveLog({
+      result: 'info',
+      apiEndPoint: '/submissions', // 실제 엔드포인트는 변경 가능
+      latency: apiLatency,
+      message: `${student.sub} 고유 아이디를 가진 학생이 평가 제출 API를 호출했습니다.`,
+      submission: submission,
+    });
+
+    return {
+      result: 'ok',
+      message: null,
+      studentId: findStudent.studentId,
+      studentName: findStudent.name,
+      score: aiAnswer.score,
+      feedback: aiAnswer.feedback,
+      highlights: aiAnswer.highlights,
+      highlightSubmitText,
+      submitText,
+      mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
+      apiLatency,
+    };
+  }
+
+  // 디비 작업 트랜잭션
+  async createTransaction(
+    createSubmissionDto: CreateSubmissionDto,
+    videoFile,
+    submitText: string,
+    aiAnswer,
+    findStudent: Student,
+    isVideoFile: boolean,
+    audioSasUrl: string,
+    videoSasUrl: string,
+  ) {
     // 트랜잭션을 사용하여 데이터 저장 무결성 확보
-    await this.dataSource.transaction(async (manager) => {
+    return await this.dataSource.transaction(async (manager) => {
       // submission DB에 저장
       const submission = manager.create(Submission, {
         ...createSubmissionDto,
@@ -147,27 +160,46 @@ export class SubmissionService {
 
         await manager.save(SubmissionMedia, submissionMedia);
       }
+
+      return submission;
     });
+  }
 
-    // API 호출 후 시간 기록
-    const endTime = Date.now();
+  // ai 답변 가져오기
+  async getAiAnswer(submitText: string) {
+    const prompt = `당신은 영어 문법 선생님입니다. 내용에 대하여 score, feedback, highlights를 작성해주세요. 내용: ${submitText} 답변은 한국어로 부탁드리고 답변 예시 형식에 꼭 맞춰주시고 JSON 형식으로 반환해주세요.
+    답변 예시) score: 2 10점 만점 평가, feedback: 전반적으로 잘 작성했지만 부족한 부분을 말씀 드리겠습니다, highlights: ["test", "where"] 내용에 대해 감전한 부분을 배열로 넣기`;
 
-    // 응답 시간 측정
-    const apiLatency = endTime - startTime;
+    // ai 답변 가져오기
+    const aiAnswer = await this.azureOpenAIService.openAI(prompt);
 
-    return {
-      result: 'ok',
-      message: null,
-      studentId: findStudent.studentId,
-      studentName: findStudent.name,
-      score: aiAnswer.score,
-      feedback: aiAnswer.feedback,
-      highlights: aiAnswer.highlights,
-      highlightSubmitText,
-      submitText,
-      mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
-      apiLatency,
-    };
+    return aiAnswer;
+  }
+
+  // 비디오 변환 로직 및 sasUrl 가져오기
+  async processFiles(
+    videoFile: Express.Multer.File,
+    studentId: string,
+  ): Promise<{ audioSasUrl: string; videoSasUrl: string }> {
+    if (!videoFile) return { audioSasUrl: '', videoSasUrl: '' };
+
+    // 비디오 변환 오디오 추출
+    const audio = await this.videoService.audio(videoFile, studentId);
+    const video = await this.videoService.videoInNoAudio(videoFile, studentId);
+
+    // azure sas url
+    const audioSasUrl = await this.azureService.uploadToAzureBlob(
+      audio,
+      studentId,
+      'audio',
+    );
+    const videoSasUrl = await this.azureService.uploadToAzureBlob(
+      video,
+      studentId,
+      'video',
+    );
+
+    return { audioSasUrl, videoSasUrl };
   }
 
   // api 사용하는 유저와 body 유저가 맞는지 확인하는 로직
@@ -193,6 +225,26 @@ export class SubmissionService {
       );
 
     return findStudent;
+  }
+
+  // componentType 체크
+  async checkComponentType(findStudent: Student, componentType: string) {
+    // component type 중복 체크
+    const existComponentType = await this.submissionRepository.findOne({
+      where: {
+        student: {
+          id: findStudent.id, // 여기서 student 테이블의 studentId를 비교
+        },
+        componentType,
+      },
+      relations: ['student'],
+    });
+
+    // if (existComponentType) {
+    //   throw new BadRequestException(
+    //     '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
+    //   );
+    // }
   }
 
   // 감점 된 부분 정규식을 이용하여 강조 태그
