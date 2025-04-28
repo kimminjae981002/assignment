@@ -53,6 +53,8 @@ async function bootstrap() {
     },
   });
 
+  console.log(`${PORT}로 서버가 열렸습니다.`);
+
   await app.listen(PORT);
 }
 bootstrap();
