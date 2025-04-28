@@ -10,6 +10,10 @@
 
 - [ERD (DB 설계)] 링크: https://drawsql.app/teams/-2817/diagrams/evaluation
 
+## ⚓ 배포 서버(Swagger)
+
+- http://16.176.15.154:3000/api-docs
+
 ## 🧱 기술 스택
 
 - NodeJS(20.19.0)
@@ -20,9 +24,11 @@
 
 - TypeORM (PostgreSQL)
 
-- OpenAI API
+- Azure OpenAI API
 
 - Azure Blob Storage
+
+- AWS EC2, RDS
 
 ## 📬 API 문서
 
