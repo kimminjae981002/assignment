@@ -106,6 +106,8 @@ export class AuthService {
       expiresIn: '7d',
     });
 
+    console.log('로그인에 성공했습니다.');
+
     return {
       success: true,
       accessToken,

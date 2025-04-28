@@ -10,7 +10,7 @@
 
 - [ERD (DB 설계)] 링크: https://drawsql.app/teams/-2817/diagrams/evaluation
 
-## ⚓ 배포 서버(Swagger)
+## ⚓ 배포 서버(Swagger) 및 API 문서
 
 - http://16.176.15.154:3000/api-docs
 
@@ -30,9 +30,7 @@
 
 - AWS EC2, RDS
 
-## 📬 API 문서
-
-- Swagger: http://localhost:3000/api-docs
+- github actions
 
 ## 📁 디렉터리 구조
 

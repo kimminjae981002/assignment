@@ -17,7 +17,7 @@ export class VideoService {
 
     const outputAudioPath = path.join(
       studentDir,
-      `${studentId}-${uniqueFileName}.mp4`,
+      `${studentId}-${uniqueFileName}.mp3`,
     );
 
     // 음성 추출
