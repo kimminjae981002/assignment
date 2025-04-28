@@ -36,4 +36,4 @@ jobs:
           pm2 kill &&
           git pull origin master &&
           npm install &&
-          pm2 start nest-server"
+          pm2 start dist/main.js --name "nest-server"
