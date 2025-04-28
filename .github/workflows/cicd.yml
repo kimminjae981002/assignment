@@ -22,9 +22,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
-
       # EC2 키 설정
       - name: Setup SSH key
         run: |
@@ -35,6 +32,9 @@ jobs:
       - name: SSH to EC2 and update code
         run: |
           ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "
-           cd /home/ubuntu/assignment && 
-            git pull origin master &&
-            pm2 reload nest-server"
+          cd /home/ubuntu/assignment &&
+          git add . &&
+          git commit -m 'Save local changes before pulling' &&
+          git pull origin master &&
+          npm install &&
+          pm2 reload nest-server"
