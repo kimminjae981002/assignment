@@ -34,4 +34,4 @@ jobs:
       # SSH로 EC2에 접속하여 pm2 서버 재시작
       - name: Reload PM2 on EC2
         run: |
-          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "pm2 reload dist/main.js --name 'nest-server'"
+          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "pm2 reload nest-server"
