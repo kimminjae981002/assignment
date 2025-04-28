@@ -33,7 +33,7 @@ jobs:
         run: |
           ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "
           cd /home/ubuntu/assignment &&
-          pm2 kill nest-server &&
+          pm2 kill &&
           git pull origin master &&
           npm install &&
           pm2 start nest-server"
