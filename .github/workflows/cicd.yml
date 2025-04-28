@@ -33,7 +33,7 @@ jobs:
         run: |
           ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }}  << 'EOF'
           cd /home/ubuntu/assignment
-          git pull
+          git pull origin master
           npm install
           npm run build
           pm2 reload dist/main.js --name "nest-server"
