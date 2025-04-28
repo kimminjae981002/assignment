@@ -33,8 +33,9 @@ jobs:
         run: |
           ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "
           cd /home/ubuntu/assignment &&
+          git pull origin master &&
           git add . &&
           git commit -m 'CI/CD Commit' &&
-          git pull origin master &&
+          git push origin master &&
           npm install &&
           pm2 reload nest-server"
