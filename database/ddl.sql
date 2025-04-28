@@ -71,3 +71,27 @@ CREATE TABLE public.submissions (
 -- public.submissions foreign keys
 
 ALTER TABLE public.submissions ADD CONSTRAINT "FK_435def3bbd4b4bbb9de1209cdae" FOREIGN KEY (user_id) REFERENCES public.students(id);
+
+
+
+##### 평가 재평가 로그 테이블 #####
+CREATE TABLE public.submission_logs (
+	id serial4 NOT NULL,
+	trace_id varchar NOT NULL,
+	latency int4 NOT NULL,
+	"result" varchar NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	submission_id int4 NULL,
+	revision_id int4 NULL,
+	api_end_point varchar NOT NULL,
+	message varchar NOT NULL,
+	CONSTRAINT "PK_0e54ea9fe9d685e1614d8dc9dbf" PRIMARY KEY (id),
+	CONSTRAINT "REL_90a0447df332ee34a42ab096b4" UNIQUE (submission_id),
+	CONSTRAINT "UQ_005ade7bbc85e7b190565ecfbe0" UNIQUE (revision_id)
+);
+
+
+-- public.submission_logs foreign keys
+
+ALTER TABLE public.submission_logs ADD CONSTRAINT "FK_005ade7bbc85e7b190565ecfbe0" FOREIGN KEY (revision_id) REFERENCES public.revisions(id);
+ALTER TABLE public.submission_logs ADD CONSTRAINT "FK_90a0447df332ee34a42ab096b4a" FOREIGN KEY (submission_id) REFERENCES public.submissions(id);
