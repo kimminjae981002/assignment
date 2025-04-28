@@ -16,14 +16,16 @@ export class SubmissionLogService {
   ) {
     // winston 로거 초기화
     this.logger = winston.createLogger({
-      transports: [
-        new winston.transports.Console({
-          format: winston.format.printf(({ level, message }) => {
-            // 필요한 정보만 출력
-            return `[${level}] ${message}`;
-          }),
+      level: 'info',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.colorize(),
+        winston.format.printf(({ timestamp, level, message }) => {
+          return `[${timestamp}] ${process.pid} [${level}] ${message}`;
         }),
-        // DBTransport 인스턴스를 생성하고 submissionLogRepository 전달
+      ),
+      transports: [
+        new winston.transports.Console(),
         new DBTransport(this.submissionLogRepository),
       ],
     });
@@ -42,6 +44,7 @@ export class SubmissionLogService {
       latency: info.latency,
       message: info.message,
       submission: info.submission,
+      revision: info.revision,
     });
 
     return { success: true };

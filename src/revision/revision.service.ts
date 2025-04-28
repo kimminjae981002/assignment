@@ -1,3 +1,4 @@
+import { SubmissionLogService } from './../logger/submission-log.service';
 import { CreateRevisionDto } from './dto/create-revision.dto';
 import { AzureOpenAIService } from 'src/azure/azure-openai.service';
 import {
@@ -20,6 +21,7 @@ export class RevisionService {
     private readonly submissionRepository: Repository<Submission>,
     private readonly azureOpenAIService: AzureOpenAIService,
     private readonly dataSource: DataSource,
+    private readonly submissionLogService: SubmissionLogService,
   ) {}
 
   // 재평가 요청
@@ -27,6 +29,8 @@ export class RevisionService {
     createRevisionDto: CreateRevisionDto,
     student: JwtPayloadInterface,
   ) {
+    const startTime = Date.now();
+
     const { revision_reason, isRevision, submission_id } = createRevisionDto;
 
     const submission = await this.submissionRepository.findOne({
@@ -48,8 +52,43 @@ export class RevisionService {
     // openAI 호출 재평가 받기
     const feedbackAI = await this.azureOpenAIService.openAI(prompt);
 
+    // 트랜잭션 실행
+    const revision = await this.createTransaction(
+      submission_id,
+      feedbackAI,
+      revision_reason,
+      isRevision,
+      submission,
+    );
+
+    // API 호출 후 시간 기록
+    const endTime = Date.now();
+
+    // 응답 시간 측정
+    const apiLatency = endTime - startTime;
+
+    // createSubmission 호출 (로그 기록)
+    await this.submissionLogService.saveLog({
+      result: 'info',
+      apiEndPoint: '/revision', // 실제 엔드포인트는 변경 가능
+      latency: apiLatency,
+      message: `${student.sub} 고유 아이디를 가진 학생이 재평가 제출 API를 호출했습니다.`,
+      revision: revision,
+    });
+
+    return { result: 'ok', message: '해당 평가에 대해 재평가 되었습니다. ' };
+  }
+
+  // 데이터 저장 트랜잭션 로직
+  async createTransaction(
+    submission_id: number,
+    feedbackAI,
+    revision_reason: string,
+    isRevision: boolean,
+    submission: Submission,
+  ) {
     // 트랜잭션 설정
-    await this.dataSource.transaction(async (manager) => {
+    return await this.dataSource.transaction(async (manager) => {
       // 재평가 시 AI 평가 업데이트
       await manager.update(
         Submission,
@@ -71,9 +110,9 @@ export class RevisionService {
 
       // submission DB에 저장
       await manager.save(Revision, revision);
-    });
 
-    return { result: 'ok', message: '해당 평가에 대해 재평가 되었습니다. ' };
+      return revision;
+    });
   }
 
   // 재평가 조회

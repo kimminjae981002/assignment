@@ -16,7 +16,15 @@ export class DBTransport extends TransportStream {
 
   async log(info: any, callback: () => void): Promise<void> {
     // winston에서 처리하는 로그 정보
-    const { result, apiEndPoint, traceId, latency, message, submission } = info;
+    const {
+      result,
+      apiEndPoint,
+      traceId,
+      latency,
+      message,
+      revision,
+      submission,
+    } = info;
 
     try {
       // winston에서 받아서 db에 저장
@@ -27,6 +35,7 @@ export class DBTransport extends TransportStream {
         latency,
         message,
         submission,
+        revision,
       });
 
       await this.submissionLogRepository.save(logEntry);

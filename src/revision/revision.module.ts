@@ -6,10 +6,12 @@ import { Submission } from 'src/submission/entities/submission.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AzureModule } from 'src/azure/azure.module';
 import { Student } from 'src/student/entities/student.entity';
+import { LoggerModule } from 'src/logger/logger.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Submission, Revision, Student]),
+    LoggerModule,
     AzureModule,
   ],
   providers: [RevisionService],

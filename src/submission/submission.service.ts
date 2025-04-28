@@ -72,12 +72,6 @@ export class SubmissionService {
       aiAnswer.highlights,
     );
 
-    // API 호출 후 시간 기록
-    const endTime = Date.now();
-
-    // 응답 시간 측정
-    const apiLatency = endTime - startTime;
-
     // db 작업 트랜잭션 로직
     const submission = await this.createTransaction(
       createSubmissionDto,
@@ -89,6 +83,12 @@ export class SubmissionService {
       audioSasUrl,
       videoSasUrl,
     );
+
+    // API 호출 후 시간 기록
+    const endTime = Date.now();
+
+    // 응답 시간 측정
+    const apiLatency = endTime - startTime;
 
     // createSubmission 호출 (로그 기록)
     await this.submissionLogService.saveLog({
