@@ -31,7 +31,10 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > key-pair-secret.pem
           chmod 600 key-pair-secret.pem
 
-      # SSH로 EC2에 접속하여 pm2 서버 재시작
-      - name: Reload PM2 on EC2
+      # ubuntu 접속 및 코드 최신화 재실행
+      - name: SSH to EC2 and update code
         run: |
-          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "pm2 reload nest-server"
+          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} "
+            cd /assignment &&
+            git pull origin master &&
+            pm2 reload nest-server"
