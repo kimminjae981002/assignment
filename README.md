@@ -14,6 +14,10 @@
 
 - http://16.176.15.154:3000/api-docs
 
+## 📥 테스트 방법
+
+- npm run test:auth / revision / submission / azure / video / azureOpenAi
+
 ## 🧱 기술 스택
 
 - NodeJS(20.19.0)
@@ -49,9 +53,11 @@ src
 
 ## 🛠️ 실행 방법
 
-#### 1. npm install
+#### 1. git clone https://github.com/kimminjae981002/assignment.git
 
-#### 2. 환경변수(.env.local)
+#### 2. npm install
+
+#### 3. 환경변수(.env.local)
 
 ```
 NODE_ENV=local
@@ -87,4 +93,4 @@ NODE_ENV=local
   AZURE_OPENAI_MODEL=azure_openai_model
 ```
 
-#### 3. npm run start:dev
+#### 4. npm run start:dev
