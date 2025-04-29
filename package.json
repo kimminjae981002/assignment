@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:auth": "jest --testPathPattern=src/auth"
+    "test:auth": "jest --testPathPattern=auth --coverage --collectCoverageFrom=auth/*"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
@@ -95,6 +95,9 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
-    }
+    },
+    "coveragePathIgnorePatterns": [
+      "module.ts"
+    ]
   }
 }
