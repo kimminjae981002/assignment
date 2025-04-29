@@ -6,13 +6,17 @@
 
 > 또한 음성 파일을 평가하는 기능도 개발 예정입니다.
 
-## 📚 프로젝트 문서
+## 📚 필수 산출물
+
+- [배포 방법]: AWS EC2 & github actions를 통해 클라우드 배포 및 자동화 배포 적용
 
 - [기능 정의(Notion)] 링크: https://www.notion.so/Evaluation-1de87a33571f80e89510c951480b565e
 
 - [ERD (DB 설계)] 링크: https://drawsql.app/teams/-2817/diagrams/evaluation
 
-- ![화면 캡처 2025-04-29 220233](https://github.com/user-attachments/assets/dd989ab3-aec0-4eea-86b5-808eefaf95af)
+![화면 캡처 2025-04-29 220233](https://github.com/user-attachments/assets/dd989ab3-aec0-4eea-86b5-808eefaf95af)
+
+- [DDL] database 폴더 링크: https://github.com/kimminjae981002/assignment/tree/master/database
 
 ## ⚓ 배포 서버(Swagger) 및 API 문서
 
@@ -66,6 +70,8 @@
 - AWS EC2, RDS
 
 - github actions
+
+- Jest
 
 ## 📁 디렉터리 구조
 
