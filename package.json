@@ -21,7 +21,8 @@
     "test:auth": "jest --testPathPattern=auth --coverage --collectCoverageFrom=auth/*",
     "test:azure": "jest --testPathPattern=azure --coverage --collectCoverageFrom=azure/*",
     "test:video": "jest --testPathPattern=video --coverage --collectCoverageFrom=video/*",
-    "test:submission": "jest --testPathPattern=submission --coverage --collectCoverageFrom=submission/*"
+    "test:submission": "jest --testPathPattern=submission --coverage --collectCoverageFrom=submission/*",
+    "test:revision": "jest --testPathPattern=revision --coverage --collectCoverageFrom=revision/*"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",

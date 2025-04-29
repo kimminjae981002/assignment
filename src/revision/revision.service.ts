@@ -76,7 +76,7 @@ export class RevisionService {
       revision: revision,
     });
 
-    return { result: 'ok', message: '해당 평가에 대해 재평가 되었습니다. ' };
+    return { result: 'ok', message: '해당 평가에 대해 재평가 되었습니다.' };
   }
 
   // 데이터 저장 트랜잭션 로직
@@ -130,7 +130,7 @@ export class RevisionService {
     if (revisions.length === 0) {
       return {
         status: 204,
-        result: revisions || [],
+        result: 'failed',
         message: '재평가를 조회할 수 없습니다.',
       };
     }
@@ -149,7 +149,8 @@ export class RevisionService {
 
     if (!revision) {
       return {
-        result: false,
+        status: 204,
+        result: 'failed',
         message: '재평가를 조회할 수 없습니다.',
       };
     }

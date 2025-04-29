@@ -30,26 +30,28 @@ describe('SubmissionsController', () => {
     expect(submissionController).toBeDefined();
   });
 
+  // 평가 제출 시 테스트
   describe('sendSubmission', () => {
     it('should call submissionService.sendSubmission', async () => {
-      const dto = {
+      const submissionDto = {
         studentId: 'test',
         studentName: 'test',
         componentType: 'Essay Whiting',
         submitText: 'test',
       };
 
-      const student = {
+      const studentJwt = {
         sub: 1,
         studentId: 'test',
         name: 'test',
       };
 
+      // 예상 응답 값
       const expectedResponse = {
         result: 'ok',
         message: null,
-        studentId: student.studentId,
-        studentName: student.name,
+        studentId: studentJwt.studentId,
+        studentName: studentJwt.name,
         score: 9,
         feedback: '아쉽지만...',
         highlights: ['test'],
@@ -71,13 +73,17 @@ describe('SubmissionsController', () => {
 
       // 실제 controller에서 메서드 호출
       const result = await submissionController.sendSubmission(
-        dto,
-        student,
+        submissionDto,
+        studentJwt,
         file,
       );
 
-      // authService.signUp이 실행됐나
-      expect(submissionController.sendSubmission).toHaveBeenCalledWith(dto);
+      // mock 함수가 실행이 됐나
+      expect(mockSubmissionService.sendSubmission).toHaveBeenCalledWith(
+        submissionDto,
+        studentJwt,
+        file,
+      );
 
       // 반환 값과 맞냐
       expect(result).toEqual(expectedResponse);

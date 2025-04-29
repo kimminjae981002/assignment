@@ -43,7 +43,7 @@ const mockSubmissionLogService = {
 };
 
 const mockDataSource = {
-  transaction: jest.fn(), // ✅ 올바른 메서드 이름
+  transaction: jest.fn(),
 };
 
 describe('SubmissionsService', () => {
