@@ -188,16 +188,19 @@ export class SubmissionService {
     const video = await this.videoService.videoInNoAudio(videoFile, studentId);
 
     // azure sas url
-    const audioSasUrl = await this.azureService.uploadToAzureBlob(
+    const audioSasUrlResponse = await this.azureService.uploadToAzureBlob(
       audio,
       studentId,
       'audio',
     );
-    const videoSasUrl = await this.azureService.uploadToAzureBlob(
+    const videoSasUrlResponse = await this.azureService.uploadToAzureBlob(
       video,
       studentId,
       'video',
     );
+
+    const audioSasUrl = audioSasUrlResponse.message;
+    const videoSasUrl = videoSasUrlResponse.message;
 
     return { audioSasUrl, videoSasUrl };
   }
@@ -240,11 +243,11 @@ export class SubmissionService {
       relations: ['student'],
     });
 
-    // if (existComponentType) {
-    //   throw new BadRequestException(
-    //     '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
-    //   );
-    // }
+    if (existComponentType) {
+      throw new BadRequestException(
+        '똑같은 과제 형식으로 중복 제출은 불가능합니다.',
+      );
+    }
   }
 
   // 감점 된 부분 정규식을 이용하여 강조 태그
@@ -296,8 +299,7 @@ export class SubmissionService {
 
     if (submissions.length === 0) {
       return {
-        status: 204,
-        result: submissions || [],
+        result: 'failed',
         message: '평가를 조회할 수 없습니다.',
       };
     }
@@ -312,7 +314,10 @@ export class SubmissionService {
     });
 
     if (!submission) {
-      throw new BadRequestException('평가가 존재하지 않습니다.');
+      return {
+        result: 'failed',
+        message: '평가가 존재하지 않습니다.',
+      };
     }
     return submission;
   }

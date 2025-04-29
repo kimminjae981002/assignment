@@ -78,7 +78,7 @@ describe('AzureOpenAIService', () => {
     });
 
     // openAI 연결과 답변 받아오기
-    it('should return azure openai answer {result: "success", ..."} ', async () => {
+    it('should return azure openai answer {feedback: "잘했찌만", ..."} ', async () => {
       // 환경변수 옵션을 만들어준다.
       mockConfigService.get.mockImplementation((key: string) => {
         const config = {
@@ -102,7 +102,6 @@ describe('AzureOpenAIService', () => {
       const result = await azureOpenAIService.openAI('test');
 
       expect(result).toEqual({
-        result: 'success',
         score: 7,
         feedback: '잘했지만...',
         highlights: ['abc', 'def'],

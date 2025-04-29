@@ -78,7 +78,6 @@ export class AzureOpenAIService {
       }
 
       return {
-        result: 'success',
         score: parsedResponse.score,
         feedback: parsedResponse.feedback,
         highlights: parsedResponse.highlights,

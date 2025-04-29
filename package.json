@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:auth": "jest --testPathPattern=auth --coverage --collectCoverageFrom=auth/*",
     "test:azure": "jest --testPathPattern=azure --coverage --collectCoverageFrom=azure/*",
-    "test:video": "jest --testPathPattern=video --coverage --collectCoverageFrom=video/*"
+    "test:video": "jest --testPathPattern=video --coverage --collectCoverageFrom=video/*",
+    "test:submission": "jest --testPathPattern=submission --coverage --collectCoverageFrom=submission/*"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",

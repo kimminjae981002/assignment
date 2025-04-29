@@ -33,7 +33,7 @@ export class CreateSubmissionDto {
   })
   @IsEnum(ComponentType)
   @IsNotEmpty()
-  componentType: ComponentType;
+  componentType: string;
 
   @ApiProperty({
     description: '제출 상세 내용',

@@ -61,8 +61,7 @@ describe('AzureService', () => {
     );
 
     expect(result).toEqual({
-      result: 'success',
-      message: 'https://....',
+      sasUrl: 'https://....',
     });
   });
 });

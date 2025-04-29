@@ -31,7 +31,7 @@ export class VideoService {
         .run();
     });
 
-    return { result: 'success', outputAudioPath };
+    return outputAudioPath;
   }
 
   // 왼쪽 이미지 제거 & 오디오 없는 비디오 추출
@@ -57,7 +57,7 @@ export class VideoService {
         .run();
     });
 
-    return { result: 'success', outputVideoNoAudioPath };
+    return outputVideoNoAudioPath;
   }
 
   async uploadPath(file, studentId: string) {
