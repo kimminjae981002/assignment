@@ -1,42 +1,42 @@
-name: CI/CD Pipeline
+# name: CI/CD Pipeline
 
-# master 브랜치에 push나 pull request가 있을 때 실행된다.
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+# # master 브랜치에 push나 pull request가 있을 때 실행된다.
+# on:
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     branches:
+#       - master
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '20'
 
-      # EC2 키 설정
-      - name: Setup SSH key
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > key-pair-secret.pem
-          chmod 600 key-pair-secret.pem
+#       # EC2 키 설정
+#       - name: Setup SSH key
+#         run: |
+#           echo "${{ secrets.EC2_SSH_KEY }}" > key-pair-secret.pem
+#           chmod 600 key-pair-secret.pem
 
-      # ubuntu 접속 및 코드 최신화 재실행
-      - name: SSH to EC2 and update code
-        run: |
-          ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }}  << 'EOF'
-          cd /home/ubuntu/assignment
-          git pull origin master
-          npm install
-          # 업로드 디렉토리 권한 수정
-          sudo chmod -R 775 /uploads
-          sudo chown -R ubuntu:ubuntu /uploads
-          pm2 reload nest-server
-          EOF
+#       # ubuntu 접속 및 코드 최신화 재실행
+#       - name: SSH to EC2 and update code
+#         run: |
+#           ssh -i key-pair-secret.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }}  << 'EOF'
+#           cd /home/ubuntu/assignment
+#           git pull origin master
+#           npm install
+#           # 업로드 디렉토리 권한 수정
+#           sudo chmod -R 775 /uploads
+#           sudo chown -R ubuntu:ubuntu /uploads
+#           pm2 reload nest-server
+#           EOF
