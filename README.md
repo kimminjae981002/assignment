@@ -18,6 +18,25 @@
 
 - http://16.176.15.154:3000/api-docs
 
+#### 🌊 사용 흐름
+
+1. POST /signUp 회원가입
+2. POST /login 로그인 (accessToken: "token" 오른쪽 위 Authorize : token 삽입)
+   - TEST ID: example123 TEST PW: Example123!
+3. POST /submissions 평가 제출 - studentId, studentName, submitText, componentType(Essay Whiting, Speaking), file
+   현재 로그인 한 사용자 ID, name이 같아야 합니다.(가드 검증)
+   - 평가 과제를 제출하면 AI가 피드백을 해줍니다.
+   - 평가 파일을 제출하면 변환된 파일은 Azure Blob Container에 저장됩니다.
+   - API 호출 시 Logger를 통해 로그가 DB에 저장 됩니다.
+4. GET /submissions 평가 전체 조회
+5. GET /submissions/:submissionId 평가 상세 조회
+6. POST /revision 재평가 제출 - submission_id, revision_reason, isRevision
+   원하는 평가 고유아이디를 작성하여 재평가를 받을 수 있습니다.
+   - 재평가를 제출하면 AI가 피드백을 하며 submission에 업데이트 됩니다.
+   - API 호출 시 Logger를 통해 로그가 DB에 저장 됩니다.
+7. GET /revision 재평가 전체 조회
+8. GET /revision/:revisionId 재평가 상세 조회
+
 ## 📥 테스트 명령어
 
 ```
