@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
 import { AzureOpenAI } from 'openai';
+
 @Injectable()
 export class AzureOpenAIService {
   constructor(private readonly configService: ConfigService) {}
@@ -30,7 +30,10 @@ export class AzureOpenAIService {
       !openAIModel ||
       !openAIVersion
     ) {
-      throw new BadRequestException('OpenAI 연동에 실패했습니다.');
+      return {
+        result: 'failed',
+        message: 'Azure OpenAI 정보를 가져오지 못했습니다.',
+      };
     }
 
     // OpenAI에 연동
@@ -68,12 +71,14 @@ export class AzureOpenAIService {
         !parsedResponse.score ||
         typeof parsedResponse !== 'object'
       ) {
-        throw new BadRequestException(
-          'AI에게 답변 받을 떄 원하는 방식이 아닙니다.',
-        );
+        return {
+          result: 'failed',
+          message: 'AI에게 답변 받을 떄 원하는 방식이 아닙니다.',
+        };
       }
 
       return {
+        result: 'success',
         score: parsedResponse.score,
         feedback: parsedResponse.feedback,
         highlights: parsedResponse.highlights,

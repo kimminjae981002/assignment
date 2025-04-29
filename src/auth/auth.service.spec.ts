@@ -163,7 +163,7 @@ describe('AuthService', () => {
       expect(mockStudentRepository.findOne).toHaveBeenCalledTimes(2);
     });
 
-    it('should return {success:true, message:"회원가입에 성공했습니다."}', async () => {
+    it('should return {result:"success", message:"회원가입에 성공했습니다."}', async () => {
       // 테스트 시작 시 명시적으로 초기화
       mockStudentRepository.findOne.mockClear();
 
@@ -207,7 +207,7 @@ describe('AuthService', () => {
       const result = await authService.signUp(createStudentDto);
 
       expect(result).toEqual({
-        success: true,
+        result: 'success',
         message: '회원가입에 성공했습니다.',
       });
 
@@ -270,7 +270,7 @@ describe('AuthService', () => {
       expect(mockStudentRepository.findOne).toHaveBeenCalledTimes(1);
     });
 
-    it('should return {success:true, accessToken:"accessToken", refreshToken: "refreshToken"}', async () => {
+    it('should return {result:"success", accessToken:"accessToken", refreshToken: "refreshToken"}', async () => {
       // 테스트 시작 시 명시적으로 초기화
       mockStudentRepository.findOne.mockClear();
       bcrypt.compare.mockClear();
@@ -308,7 +308,7 @@ describe('AuthService', () => {
       const result = await authService.login(loginStudentDto);
 
       expect(result).toEqual({
-        success: true,
+        result: 'success',
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
       });

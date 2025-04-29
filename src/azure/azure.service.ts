@@ -19,7 +19,7 @@ export class AzureService {
     filePath: string,
     studentId: string,
     fileType: 'audio' | 'video',
-  ): Promise<string> {
+  ) {
     // Azure 설정 환경변수 가져오기
     const azureAccount: string = this.configService.get<string>(
       'AZURE_STORAGE_ACCOUNT',
@@ -34,7 +34,10 @@ export class AzureService {
     ) as string;
 
     if (!azureAccount || !azureAccountKey || !azureContainerName) {
-      throw new BadRequestException('AZURE 설정 실패');
+      return {
+        result: 'failed',
+        message: 'AZURE 정보를 가져오지 못했습니다.',
+      };
     }
 
     // azure storage name과 key를 이용해 azure에 인증한다.
@@ -86,6 +89,9 @@ export class AzureService {
     // AI가 음성 영상 데이터로 평가하는 기능도 추가할 예정
     const sasUrl = `${blockBlobClient.url}?${sasToken}`;
 
-    return sasUrl;
+    return {
+      result: 'success',
+      message: sasUrl,
+    };
   }
 }

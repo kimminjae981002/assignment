@@ -65,7 +65,7 @@ export class AuthService {
     await this.studentRepository.save(newStudent);
 
     return {
-      success: true,
+      result: 'success',
       message: '회원가입에 성공했습니다.',
     };
   }
@@ -121,7 +121,7 @@ export class AuthService {
     console.log('로그인에 성공했습니다.');
 
     return {
-      success: true,
+      result: 'success',
       accessToken,
       refreshToken,
     };

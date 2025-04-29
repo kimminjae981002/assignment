@@ -18,6 +18,8 @@ async function bootstrap() {
     prefix: '/uploads/', // URL 경로에 /uploads 를 붙여서 접근할 수 있도록 설정
   });
 
+  app.setGlobalPrefix('/api');
+
   // PORT 환경변수
   const configService = app.get(ConfigService);
   const PORT: number = configService.get<number>('SERVER_PORT') ?? 3000;
