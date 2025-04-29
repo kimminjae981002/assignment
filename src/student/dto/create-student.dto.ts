@@ -52,7 +52,7 @@ export class CreateStudentDto {
   })
   @IsNotEmpty()
   @IsEnum(Gender, { message: '잘못된 성별 값입니다.' })
-  gender: Gender;
+  gender: string;
 
   @ApiProperty({ description: '생년월일', example: '2000-01-01' })
   @IsDateString({ strict: true })

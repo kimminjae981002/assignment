@@ -27,10 +27,13 @@ export class AuthService {
     const { studentId, password, email } = createStudentDto;
 
     // 이미 존재하는 유저 찾기
-    const existStudent: Student | null = await this.findStudentId(studentId);
+    const existStudent: Student | null = await this.findStudent(studentId);
 
     if (existStudent) {
-      throw new ConflictException('해당 아이디로는 가입할 수 없습니다.');
+      return {
+        result: 'failed',
+        message: '이미 존재하는 아이디입니다.',
+      };
     }
 
     // 이미 존재하는 이메일 찾기
@@ -39,7 +42,10 @@ export class AuthService {
     });
 
     if (existEmail) {
-      throw new ConflictException('해당 이메일로는 가입할 수 없습니다.');
+      return {
+        result: 'failed',
+        message: '이미 존재하는 이메일입니다.',
+      };
     }
 
     // bcrypt에서 찾을 해쉬 찾기
@@ -69,17 +75,23 @@ export class AuthService {
     const { studentId, password } = loginStudentDto;
 
     // 존재하는 유저인지 찾기
-    const student: Student | null = await this.findStudentId(studentId);
+    const student: Student | null = await this.findStudent(studentId);
 
     if (!student) {
-      throw new NotFoundException('존재하지 않는 유저입니다.');
+      return {
+        result: 'failed',
+        message: '존재하지 않는 유저입니다.',
+      };
     }
 
     // 암호화 비밀번호 체크
     const comparePassword = await bcrypt.compare(password, student.password);
 
     if (!comparePassword) {
-      throw new UnauthorizedException('아이디 또는 비밀번호가 틀렸습니다.');
+      return {
+        result: 'failed',
+        message: '아이디 또는 비밀번호가 틀렸습니다.',
+      };
     }
 
     // access token payload
@@ -115,8 +127,8 @@ export class AuthService {
     };
   }
 
-  // 유저 아이디 찾기
-  async findStudentId(studentId: string) {
+  // 유저 찾기
+  async findStudent(studentId: string) {
     return await this.studentRepository.findOne({ where: { studentId } });
   }
 }
