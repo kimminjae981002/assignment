@@ -12,6 +12,8 @@
 
 - [ERD (DB 설계)] 링크: https://drawsql.app/teams/-2817/diagrams/evaluation
 
+- ![화면 캡처 2025-04-29 220233](https://github.com/user-attachments/assets/dd989ab3-aec0-4eea-86b5-808eefaf95af)
+
 ## ⚓ 배포 서버(Swagger) 및 API 문서
 
 - http://16.176.15.154:3000/api-docs
