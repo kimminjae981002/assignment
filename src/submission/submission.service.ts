@@ -109,7 +109,12 @@ export class SubmissionService {
       highlights: aiAnswer.highlights,
       highlightSubmitText,
       submitText,
-      mediaUrl: { video: videoSasUrl, audio: audioSasUrl },
+      mediaUrl: {
+        video:
+          '보안 상 제거했습니다. https://storage.blob.../container/암호화/preview',
+        audio:
+          '보안 상 제거했습니다. https://storage.blob.../container/암호화/preview',
+      },
       apiLatency,
     };
   }
