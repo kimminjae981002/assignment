@@ -1,8 +1,10 @@
 # 💬 [AI 기반 학생 영어 과제 프로젝트]
 
-> 학생이 영어 문법에 대한 과제를 제출을 하면 AI가 그에 대한 피드백을 주는 프로젝트입니다.
+> 학생의 영어 Essay 과제를 AI가 평가하고, 점수 및 피드백을 제공하는 과제입니다.
 
-> 음성 파일을 평가하는 기능도 개발 예정입니다.
+> Azure OpenAI, Azure Blob Storage, Aws EC2, Aws RDS, Github actions, winston, Jest 등이 포함되어 있습니다.
+
+> 또한 음성 파일을 평가하는 기능도 개발 예정입니다.
 
 ## 📚 프로젝트 문서
 
@@ -14,9 +16,17 @@
 
 - http://16.176.15.154:3000/api-docs
 
-## 📥 테스트 방법
+## 📥 테스트 명령어
 
-- npm run test:auth / revision / submission / azure / video / azureOpenAi
+```
+- npm run test
+- npm run test:auth
+- npm run test:revision
+- npm run test:submission
+- npm run test:azure
+- npm run test:video
+- npm run test:azureOpenAi
+```
 
 ## 🧱 기술 스택
 
@@ -94,3 +104,31 @@ NODE_ENV=local
 ```
 
 #### 4. npm run start:dev
+
+# 💦 프로젝트 회고
+
+### 😀 배운 점
+
+1. azure 간단한 사용과 openAI 연동을 통해 외부 API 연동 경험
+2. ffmpeg를 이용한 영상/오디오 변환 작업
+3. logging을 위해 winston을 사용하여 db-transport를 생성하여 db에 저장
+4. test를 하기 위해 Jest 사용법, 기본적인 흐름 파악
+5. ERD 설계, API 문서화 등 개발 이외 영역까지 전체 흐름 이해
+6. 테스트를 하며 내가 생각했던 로직과 코드 품질이 정말 안 좋다는 걸 파악
+
+### 😌 어려웠던 점
+
+1. Jest를 사용하여 테스트 작성이 어려워 커버리지 확보에 한계
+2. 내가 생각했던 완성 시간 이상으로 더 걸림(중간 버그 발생)
+3. 시간 내에 최대한 완성 하기 위해 너무 급급해서 아쉬움
+4. 배포 시 postgres 설정이 까다로워 시간 소요됨
+
+### 😬 노력한 점
+
+1. Jest를 이해하기 위해 강의 듣고 블로그 작성
+
+### 😖 아쉬운 점
+
+1. Jest를 처음 사용해 Test의 중요성과 흐름을 이해하지 못했다
+2. Test의 커버리지가 많이 낮아 아쉬움
+3. 문서화 및 설계 능력이 많이 부족하다 생각함
