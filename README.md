@@ -32,6 +32,7 @@
    - 평가 과제를 제출하면 AI가 피드백을 해줍니다.
    - 평가 파일을 제출하면 변환된 파일은 Azure Blob Container에 저장됩니다.
    - API 호출 시 Logger를 통해 로그가 DB에 저장 됩니다.
+   - **SASUrl은 보안 상 숨겼습니다. submission_media 테이블에 저장됩니다.**
 4. GET /submissions 평가 전체 조회
 5. GET /submissions/:submissionId 평가 상세 조회
 6. POST /revision 재평가 제출 - submission_id, revision_reason, isRevision
