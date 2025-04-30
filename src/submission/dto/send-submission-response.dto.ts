@@ -41,8 +41,8 @@ export class sendSubmissionResponseDto {
   @ApiProperty({
     type: () => MediaUrl, // MediaUrl 타입을 사용
     example: {
-      video: 'https://example.com/video.mp4',
-      audio: 'https://example.com/audio.mp3',
+      video: 'SASUrl 보안상 제거했습니다. https://example.com...암호화/',
+      audio: 'SASUrl 보안상 제거했습니다. https://example.com...암호화/',
     },
   })
   mediaUrl: MediaUrl;
